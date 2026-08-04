@@ -282,7 +282,7 @@ export default function ProductDetailPage() {
 
       {/* Specs */}
       {specRows.length > 0 && (
-        <section className="mt-14">
+        <section className="mt-16 border-t border-brand-100 pt-8">
           <h2 className="font-display text-2xl font-bold text-brand-900">Specifications</h2>
           <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
             {specRows.map(([k, v]) => (
@@ -297,7 +297,7 @@ export default function ProductDetailPage() {
 
       {/* Sustainability */}
       {product.sustainability && (
-        <section className="mt-14">
+        <section className="mt-16 border-t border-brand-100 pt-8">
           <h2 className="font-display text-2xl font-bold text-brand-900">Sustainability</h2>
           <div className="mt-4 overflow-hidden rounded-2xl border border-emerald-100 bg-gradient-to-br from-emerald-50 to-cream-50 p-6 shadow-soft">
             <div className="flex flex-wrap items-center gap-6">
@@ -336,7 +336,7 @@ export default function ProductDetailPage() {
 
       {/* Similar */}
       {similar.length > 0 && (
-        <section className="mt-14">
+        <section className="mt-16 border-t border-brand-100 pt-8">
           <h2 className="font-display text-2xl font-bold text-brand-900">You may also like</h2>
           <div className="mt-4 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {similar.map((p) => (
