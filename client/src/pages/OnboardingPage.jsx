@@ -1,0 +1,243 @@
+import { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import ChatWindow from '../components/ChatWindow.jsx';
+import { useAiChat } from '../hooks/useAiChat.js';
+import { useAuth } from '../context/AuthContext.jsx';
+import { useToast } from '../context/ToastContext.jsx';
+import { api } from '../api/client.js';
+import { Spinner } from '../components/ui.jsx';
+
+export default function OnboardingPage() {
+  const { user, refreshUser } = useAuth();
+  const { toast } = useToast();
+  const navigate = useNavigate();
+  const isSupplier = user?.role === 'supplier';
+  const { messages, setMessages, loading, suggestions, send } = useAiChat({ mode: 'onboarding' });
+  const started = useRef(false);
+  const [progress, setProgress] = useState(null);
+  const [showManual, setShowManual] = useState(false);
+
+  useEffect(() => {
+    if (user?.onboarded && messages.length === 0) {
+      navigate(isSupplier ? '/supplier' : '/', { replace: true });
+      return;
+    }
+    if (!started.current) {
+      started.current = true;
+      setTimeout(() => send('Start'), 400);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleSend = async (text) => {
+    const data = await send(text);
+    if (data?.progress) setProgress(data.progress);
+    if (data?.onboardingComplete) {
+      setProgress(data.progress);
+      await refreshUser();
+      toast('Profile complete!');
+      setTimeout(() => navigate(isSupplier ? '/supplier' : '/', { replace: true }), 1200);
+    }
+  };
+
+  return (
+    <div className="mx-auto flex max-w-3xl flex-col px-4 py-10">
+      <div className="text-center">
+        <span className="inline-flex items-center gap-2 rounded-full bg-brand-100 px-3.5 py-1.5 text-xs font-semibold text-brand-800">
+          {isSupplier ? '🏭 Supplier onboarding' : '🛍️ Buyer onboarding'}
+        </span>
+        <h1 className="mt-3 font-display text-3xl font-bold text-brand-900">
+          {isSupplier ? 'Let\'s set up your business' : 'Tell us about your business'}
+        </h1>
+        <p className="mx-auto mt-2 max-w-md text-sm text-brand-500">
+          Answer a few quick questions in conversation with Weaver AI — it will personalize your
+          {isSupplier ? ' supplier profile' : ' marketplace'} automatically.
+        </p>
+      </div>
+
+      {progress && (
+        <div className="mx-auto mt-5 w-full max-w-md">
+          <div className="flex items-center justify-between text-xs font-medium text-brand-500">
+            <span>Step {progress.current} of {progress.total}</span>
+            <span>{Math.round((progress.current / progress.total) * 100)}%</span>
+          </div>
+          <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-brand-100">
+            <div
+              className="h-full rounded-full bg-brand-600 transition-all duration-500"
+              style={{ width: `${(progress.current / progress.total) * 100}%` }}
+            />
+          </div>
+        </div>
+      )}
+
+      <div className="mt-6 h-[60vh] overflow-hidden rounded-3xl border border-brand-100 bg-white shadow-lift">
+        <ChatWindow
+          messages={messages}
+          loading={loading}
+          suggestions={suggestions}
+          onSend={handleSend}
+          voice={true}
+          inputDisabled={loading}
+          placeholder="Type your answer here…"
+        />
+      </div>
+
+      <div className="mt-4 text-center">
+        <button
+          type="button"
+          onClick={() => setShowManual(!showManual)}
+          className="text-sm font-semibold text-brand-600 underline-offset-2 hover:underline"
+        >
+          {showManual ? 'Back to chat' : 'Prefer a form? Fill it manually'}
+        </button>
+      </div>
+
+      {showManual && <ManualOnboarding isSupplier={isSupplier} onDone={() => { refreshUser(); navigate(isSupplier ? '/supplier' : '/'); }} />}
+    </div>
+  );
+}
+
+function ManualOnboarding({ isSupplier, onDone }) {
+  const { toast } = useToast();
+  const [saving, setSaving] = useState(false);
+  const [form, setForm] = useState({
+    businessType: '',
+    industry: 'fashion',
+    interests: [],
+    fabricTypes: [],
+    typicalOrderQuantity: '500_2000',
+    budgetRange: '50k_200k',
+    businessName: '',
+    contactPhone: '',
+    moq: 100,
+    description: '',
+  });
+
+  const set = (k) => (e) => setForm({ ...form, [k]: e.target.value });
+
+  const save = async () => {
+    setSaving(true);
+    try {
+      const profile = isSupplier
+        ? {
+            businessName: form.businessName,
+            businessType: form.businessType,
+            contactPhone: form.contactPhone,
+            categories: form.interests,
+            fabricTypes: form.fabricTypes,
+            moq: Number(form.moq),
+            description: form.description,
+            operatingHours: 'weekdays_9_6',
+          }
+        : {
+            businessType: form.businessType,
+            industry: form.industry,
+            interests: form.interests,
+            fabricTypes: form.fabricTypes,
+            typicalOrderQuantity: form.typicalOrderQuantity,
+            budgetRange: form.budgetRange,
+          };
+      await api.put('/auth/profile', {
+        [isSupplier ? 'supplierProfile' : 'buyerProfile']: profile,
+      });
+      toast('Profile saved!');
+      onDone();
+    } catch (e) {
+      toast(e.message, 'error');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const options = (list) =>
+    list.map((v) => (
+      <label key={v} className="flex items-center gap-2 rounded-lg border border-brand-200 bg-cream-50 px-3 py-2 text-sm hover:border-brand-400">
+        <input
+          type="checkbox"
+          checked={form.interests.includes(v)}
+          onChange={(e) =>
+            setForm({
+              ...form,
+              interests: e.target.checked ? [...form.interests, v] : form.interests.filter((x) => x !== v),
+            })
+          }
+        />
+        {v}
+      </label>
+    ));
+
+  const inputCls = 'w-full rounded-xl border border-brand-200 bg-cream-50 px-4 py-2.5 text-sm outline-none focus:border-brand-400';
+
+  return (
+    <div className="mt-6 rounded-3xl border border-brand-100 bg-white p-6 shadow-soft sm:p-8">
+      <h2 className="font-display text-xl font-bold text-brand-900">Quick profile form</h2>
+      <div className="mt-4 grid gap-4 sm:grid-cols-2">
+        {isSupplier ? (
+          <>
+            <div className="sm:col-span-2">
+              <label className="text-sm font-medium text-brand-800">Business name *</label>
+              <input required value={form.businessName} onChange={set('businessName')} placeholder="e.g. Weaver Textiles Ltd." className={`mt-1.5 ${inputCls}`} />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-brand-800">Business type</label>
+              <input value={form.businessType} onChange={set('businessType')} placeholder="Mill, exporter, trader…" className={`mt-1.5 ${inputCls}`} />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-brand-800">Contact phone</label>
+              <input value={form.contactPhone} onChange={set('contactPhone')} placeholder="+91…" className={`mt-1.5 ${inputCls}`} />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-brand-800">MOQ (units)</label>
+              <input type="number" value={form.moq} onChange={set('moq')} className={`mt-1.5 ${inputCls}`} />
+            </div>
+          </>
+        ) : (
+          <>
+            <div>
+              <label className="text-sm font-medium text-brand-800">Business type</label>
+              <input value={form.businessType} onChange={set('businessType')} placeholder="Designer, brand, manufacturer…" className={`mt-1.5 ${inputCls}`} />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-brand-800">Industry</label>
+              <select value={form.industry} onChange={set('industry')} className={`mt-1.5 ${inputCls}`}>
+                {['fashion', 'home_textiles', 'upholstery', 'technical_textiles', 'accessories', 'footwear', 'crafts'].map((v) => (
+                  <option key={v} value={v}>{v.replaceAll('_', ' ')}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-brand-800">Typical order quantity</label>
+              <select value={form.typicalOrderQuantity} onChange={set('typicalOrderQuantity')} className={`mt-1.5 ${inputCls}`}>
+                {[['under_500', 'Under 500'], ['500_2000', '500 – 2,000'], ['2000_10000', '2,000 – 10,000'], ['over_10000', '10,000+']].map(([v, l]) => (
+                  <option key={v} value={v}>{l}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-brand-800">Budget range</label>
+              <select value={form.budgetRange} onChange={set('budgetRange')} className={`mt-1.5 ${inputCls}`}>
+                {[['under_50k', 'Under $50K'], ['50k_200k', '$50K – $200K'], ['200k_500k', '$200K – $500K'], ['over_500k', 'Over $500K']].map(([v, l]) => (
+                  <option key={v} value={v}>{l}</option>
+                ))}
+              </select>
+            </div>
+          </>
+        )}
+        <div className={isSupplier ? 'sm:col-span-2' : ''}>
+          <label className="text-sm font-medium text-brand-800">Categories of interest</label>
+          <div className="mt-1.5 grid grid-cols-2 gap-2 sm:grid-cols-3">
+            {options(['cotton', 'silk', 'linen', 'wool', 'denim', 'polyester', 'viscose', 'blends', 'lace', 'embroidery', 'technical'])}
+          </div>
+        </div>
+      </div>
+      <button
+        type="button"
+        onClick={save}
+        disabled={saving || (isSupplier && !form.businessName)}
+        className="mt-6 flex items-center gap-2 rounded-xl bg-brand-800 px-6 py-3 text-sm font-bold text-white transition hover:bg-brand-700 disabled:opacity-50"
+      >
+        {saving && <Spinner className="h-4 w-4" />} Save profile
+      </button>
+    </div>
+  );
+}
