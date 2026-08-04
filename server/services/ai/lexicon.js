@@ -18,6 +18,7 @@ export const FABRIC_TYPE_KEYWORDS = {
   woven: ['woven', 'weave'],
   knit: ['knit', 'knitted', 'jersey'],
   denim: ['denim', 'jeans'],
+  blends: ['blend', 'blends', 'pc', 'poly cotton'],
   chiffon: ['chiffon'],
   georgette: ['georgette'],
   satin: ['satin', 'sateen'],

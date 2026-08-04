@@ -29,6 +29,7 @@ export const FABRIC_TYPES = [
   'woven',
   'knit',
   'denim',
+  'blends',
   'chiffon',
   'georgette',
   'satin',

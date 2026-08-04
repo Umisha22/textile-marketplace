@@ -15,6 +15,8 @@ export const CATEGORY_LABELS = {
 export const FABRIC_TYPE_LABELS = {
   woven: 'Woven',
   knit: 'Knit',
+  denim: 'Denim',
+  blends: 'Blends',
   chiffon: 'Chiffon',
   georgette: 'Georgette',
   satin: 'Satin',
