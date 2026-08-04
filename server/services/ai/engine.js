@@ -17,13 +17,16 @@ const normalize = (text = '') => text.toLowerCase().trim();
 
 const containsAny = (text, words) => words.some((w) => text.includes(w));
 
+const containsWord = (text, words) =>
+  words.some((w) => new RegExp(`(^|[^a-z])${w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}([^a-z]|$)`, 'i').test(text));
+
 export function detectIntent(text) {
   const t = normalize(text);
   if (containsAny(t, INTENT_KEYWORDS.compare)) return 'compare';
   if (containsAny(t, INTENT_KEYWORDS.similar)) return 'similar';
   if (containsAny(t, ESTIMATE_KEYWORDS)) return 'estimate';
   if (containsAny(t, GARMENT_KEYWORDS.saree) && /meter|metre|fabric|cloth|material|estimate|need|required|for a/.test(t)) return 'estimate';
-  if (containsAny(t, INTENT_KEYWORDS.greeting)) return 'greeting';
+  if (containsWord(t, INTENT_KEYWORDS.greeting)) return 'greeting';
   if (containsAny(t, INTENT_KEYWORDS.help)) return 'help';
   if (containsAny(t, QA_KEYWORDS)) return 'qa';
   if (containsAny(t, INTENT_KEYWORDS.recommend)) return 'recommend';
@@ -150,6 +153,7 @@ export const toProductBrief = (p) => ({
   moq: p.moq,
   colors: (p.colors || []).slice(0, 4).map((c) => ({ name: c.name, hex: c.hex })),
   image: p.images && p.images[0],
+  sustainability: p.sustainability,
 });
 
 export async function findProducts(filters, limit = 6) {
@@ -200,6 +204,46 @@ export async function similarProducts(product, limit = 4) {
     .limit(limit)
     .lean();
   return products.map(toProductBrief);
+}
+
+const hexToRgb = (hex = '#888888') => {
+  const h = hex.replace('#', '').trim();
+  const full = h.length === 3 ? h.split('').map((c) => c + c).join('') : h;
+  const n = parseInt(full || '888888', 16);
+  return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 };
+};
+
+const colorDistance = (a, b) => {
+  const dr = a.r - b.r;
+  const dg = a.g - b.g;
+  const db = a.b - b.b;
+  return Math.sqrt(dr * dr + dg * dg + db * db);
+};
+
+// Find fabrics whose available colors are closest to the hex colors mentioned.
+export async function findByColorHex(text, limit = 6) {
+  const hexes = (text.match(/#?[0-9a-fA-F]{6}\b/g) || []).slice(0, 4).map((h) => hexToRgb(h));
+  if (!hexes.length) return [];
+  const products = await Product.find({ isActive: true })
+    .populate('supplier', 'name supplierProfile')
+    .limit(200)
+    .lean();
+  return products
+    .map((p) => {
+      const colors = p.colors || [];
+      if (!colors.length) return { p, d: Infinity };
+      const d = Math.min(
+        ...colors.map((c) => {
+          const cRgb = hexToRgb(c.hex);
+          return Math.min(...hexes.map((h) => colorDistance(cRgb, h)));
+        })
+      );
+      return { p, d };
+    })
+    .filter((x) => Number.isFinite(x.d))
+    .sort((a, b) => a.d - b.d)
+    .slice(0, limit)
+    .map((x) => toProductBrief(x.p));
 }
 
 export async function findByName(queryText, limit = 3) {

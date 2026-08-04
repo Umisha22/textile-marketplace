@@ -1,7 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import ChatWindow from '../components/ChatWindow.jsx';
-import { useAiChat } from '../hooks/useAiChat.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
 import { api } from '../api/client.js';
@@ -13,92 +11,35 @@ export default function OnboardingPage() {
   const { toast } = useToast();
   const navigate = useNavigate();
   const isSupplier = user?.role === 'supplier';
-  const { messages, setMessages, loading, suggestions, send } = useAiChat({ mode: 'onboarding' });
-  const started = useRef(false);
-  const [progress, setProgress] = useState(null);
-  const [showManual, setShowManual] = useState(false);
 
-  useEffect(() => {
-    if (user?.onboarded && messages.length === 0) {
-      navigate(isSupplier ? '/supplier' : '/', { replace: true });
-      return;
-    }
-    if (!started.current) {
-      started.current = true;
-      setTimeout(() => send('Start'), 400);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const handleSend = async (text) => {
-    const data = await send(text);
-    if (data?.progress) setProgress(data.progress);
-    if (data?.onboardingComplete) {
-      setProgress(data.progress);
-      await refreshUser();
-      toast('Profile complete!');
-      setTimeout(() => navigate(isSupplier ? '/supplier' : '/', { replace: true }), 1200);
-    }
+  const done = async () => {
+    await refreshUser();
+    toast('Profile complete!');
+    navigate(isSupplier ? '/supplier' : '/', { replace: true });
   };
 
   return (
-    <div className="mx-auto flex max-w-3xl flex-col px-4 py-10">
+    <div className="mx-auto max-w-3xl px-4 py-10">
       <div className="text-center">
         <span className="inline-flex items-center gap-2 rounded-full bg-brand-100 px-3.5 py-1.5 text-xs font-semibold text-brand-800">
           {isSupplier ? '🏭 Supplier onboarding' : '🛍️ Buyer onboarding'}
         </span>
         <h1 className="mt-3 font-display text-3xl font-bold text-brand-900">
-          {isSupplier ? 'Let\'s set up your business' : 'Tell us about your business'}
+          {isSupplier ? "Let's set up your business" : 'Tell us about your business'}
         </h1>
         <p className="mx-auto mt-2 max-w-md text-sm text-brand-500">
-          Answer a few quick questions in conversation with Weaver AI — it will personalize your
-          {isSupplier ? ' supplier profile' : ' marketplace'} automatically.
+          {isSupplier
+            ? 'Fill in your business details so buyers can find and trust your mill.'
+            : 'Fill in your preferences and we will personalize the marketplace for you.'}
         </p>
       </div>
 
-      {progress && (
-        <div className="mx-auto mt-5 w-full max-w-md">
-          <div className="flex items-center justify-between text-xs font-medium text-brand-500">
-            <span>Step {progress.current} of {progress.total}</span>
-            <span>{Math.round((progress.current / progress.total) * 100)}%</span>
-          </div>
-          <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-brand-100">
-            <div
-              className="h-full rounded-full bg-brand-600 transition-all duration-500"
-              style={{ width: `${(progress.current / progress.total) * 100}%` }}
-            />
-          </div>
-        </div>
-      )}
-
-      <div className="mt-6 h-[60vh] overflow-hidden rounded-3xl border border-brand-100 bg-white shadow-lift">
-        <ChatWindow
-          messages={messages}
-          loading={loading}
-          suggestions={suggestions}
-          onSend={handleSend}
-          voice={true}
-          inputDisabled={loading}
-          placeholder="Type your answer here…"
-        />
-      </div>
-
-      <div className="mt-4 text-center">
-        <button
-          type="button"
-          onClick={() => setShowManual(!showManual)}
-          className="text-sm font-semibold text-brand-600 underline-offset-2 hover:underline"
-        >
-          {showManual ? 'Back to chat' : 'Prefer a form? Fill it manually'}
-        </button>
-      </div>
-
-      {showManual && <ManualOnboarding isSupplier={isSupplier} onDone={() => { refreshUser(); navigate(isSupplier ? '/supplier' : '/'); }} />}
+      <OnboardingForm isSupplier={isSupplier} onDone={done} />
     </div>
   );
 }
 
-function ManualOnboarding({ isSupplier, onDone }) {
+function OnboardingForm({ isSupplier, onDone }) {
   const { toast } = useToast();
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
@@ -151,11 +92,9 @@ function ManualOnboarding({ isSupplier, onDone }) {
       await api.put('/auth/profile', {
         [isSupplier ? 'supplierProfile' : 'buyerProfile']: profile,
       });
-      toast('Profile saved!');
-      onDone();
+      await onDone();
     } catch (e) {
       toast(e.message, 'error');
-    } finally {
       setSaving(false);
     }
   };
@@ -178,8 +117,8 @@ function ManualOnboarding({ isSupplier, onDone }) {
   const inputCls = 'w-full rounded-xl border border-brand-200 bg-cream-50 px-4 py-2.5 text-sm outline-none focus:border-brand-400';
 
   return (
-    <div className="mt-6 rounded-3xl border border-brand-100 bg-white p-6 shadow-soft sm:p-8">
-      <h2 className="font-display text-xl font-bold text-brand-900">Quick profile form</h2>
+    <div className="mt-8 rounded-3xl border border-brand-100 bg-white p-6 shadow-soft sm:p-8">
+      <h2 className="font-display text-xl font-bold text-brand-900">Profile details</h2>
       <div className="mt-4 grid gap-4 sm:grid-cols-2">
         {isSupplier ? (
           <>

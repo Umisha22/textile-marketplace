@@ -5,6 +5,7 @@ import {
   recommendProducts,
   similarProducts,
   findByName,
+  findByColorHex,
   buildReply,
   toProductBrief,
 } from './engine.js';
@@ -121,7 +122,9 @@ async function handleSearchOrRecommend(message, context, user, currency) {
     filters.minPrice != null || filters.maxPrice != null;
 
   let products;
-  if (!hasExplicitFilters && user?.buyerProfile) {
+  if (/#[0-9a-fA-F]{6}\b/.test(message)) {
+    products = await findByColorHex(message, 6);
+  } else if (!hasExplicitFilters && user?.buyerProfile) {
     products = await recommendProducts(user.buyerProfile, 6);
   } else {
     products = await findProducts(filters, 6);
@@ -156,6 +159,10 @@ export async function handleChatMessage({ text, user, role, context = {}, histor
 
   let intent = detectIntent(message);
   let result;
+
+  if (/#[0-9a-fA-F]{6}\b/.test(message) && ['greeting', 'help', 'qa'].includes(intent)) {
+    intent = 'search';
+  }
 
   if (intent === 'greeting') result = { intent, ...GREETING_REPLY, products: [] };
   else if (intent === 'help') result = { intent, ...HELP_REPLY, products: [] };

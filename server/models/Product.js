@@ -38,6 +38,13 @@ const productSchema = new mongoose.Schema(
     stock: { type: Number, required: true, min: 0 },
     moq: { type: Number, default: 100 },
     tags: [{ type: String }],
+    sustainability: {
+      score: { type: Number, min: 0, max: 100, default: 0 },
+      recycled: { type: Boolean, default: false },
+      organic: { type: Boolean, default: false },
+      badges: [{ type: String }],
+      note: { type: String },
+    },
     isActive: { type: Boolean, default: true },
     featured: { type: Boolean, default: false },
   },

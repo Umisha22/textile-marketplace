@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import ProductImage from './ProductImage.jsx';
+import FabricIcon from './FabricIcon.jsx';
 import { formatPrice } from '../utils/format.js';
 import { CATEGORY_LABELS } from '../utils/constants.js';
 import { useCurrency } from '../hooks/useCurrency.js';
@@ -7,6 +8,7 @@ import { useCurrency } from '../hooks/useCurrency.js';
 export default function ProductCard({ product, onCompareToggle, compareActive }) {
   useCurrency();
   const out = product.stock <= 0;
+  const eco = product.sustainability?.score;
   return (
     <div className="group relative flex flex-col overflow-hidden rounded-2xl border border-brand-100 bg-white shadow-soft transition hover:-translate-y-1 hover:shadow-lift">
       <Link to={`/products/${product.slug}`} className="relative block aspect-[4/3] overflow-hidden">
@@ -21,6 +23,11 @@ export default function ProductCard({ product, onCompareToggle, compareActive })
             Featured
           </span>
         )}
+        {eco > 0 && (
+          <span className="absolute left-3 bottom-3 rounded-full bg-emerald-500/95 px-2.5 py-1 text-[11px] font-bold text-white shadow" title="Eco score">
+            🌿 {eco}
+          </span>
+        )}
         {compareActive && (
           <span className="absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-full bg-brand-600 text-sm text-white shadow">
             ✓
@@ -32,7 +39,12 @@ export default function ProductCard({ product, onCompareToggle, compareActive })
         <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-brand-500">
           <span>{CATEGORY_LABELS[product.category] || product.category}</span>
           {product.fabricType && <span className="text-brand-200">•</span>}
-          {product.fabricType && <span>{product.fabricType}</span>}
+          {product.fabricType && (
+            <span className="inline-flex items-center gap-1">
+              <FabricIcon fabricType={product.fabricType} className="h-3 w-3" />
+              {product.fabricType}
+            </span>
+          )}
         </div>
         <Link
           to={`/products/${product.slug}`}

@@ -44,7 +44,7 @@ export const createOrder = asyncHandler(async (req, res) => {
 
     const subtotal = items.reduce((sum, it) => sum + it.price * it.quantity, 0);
     const tax = Math.round(subtotal * 0.18 * 100) / 100;
-    const shipping = subtotal >= 10000 ? 0 : 500;
+    const shipping = subtotal >= 500 ? 0 : 25;
     const total = Math.round((subtotal + tax + shipping) * 100) / 100;
 
     const order = await Order.create({

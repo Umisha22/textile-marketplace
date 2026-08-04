@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import ChatWindow from '../components/ChatWindow.jsx';
 import ProductCard from '../components/ProductCard.jsx';
+import PhotoSearch from '../components/PhotoSearch.jsx';
 import { Spinner } from '../components/ui.jsx';
 import { useAiChat } from '../hooks/useAiChat.js';
 import { useAuth } from '../context/AuthContext.jsx';
@@ -22,11 +23,11 @@ export default function AssistantPage() {
   const [recLoading, setRecLoading] = useState(false);
 
   useEffect(() => {
-    if (user?.role !== 'buyer') return;
+    if (!user) return;
     setRecLoading(true);
     api
-      .post('/ai/recommend')
-      .then((d) => setRecommended(d.products || []))
+      .get('/recommendations')
+      .then((d) => setRecommended(d.recommendedProducts || d.suggestedProducts || []))
       .catch(() => {})
       .finally(() => setRecLoading(false));
   }, [user]);
@@ -57,6 +58,11 @@ export default function AssistantPage() {
             {p}
           </button>
         ))}
+        <PhotoSearch
+          label="Upload a photo to match"
+          className="rounded-full border border-brand-800 bg-brand-800 px-3.5 py-2 text-xs font-medium text-white transition hover:bg-brand-900"
+          onColors={(hexes) => send(`Find fabrics matching these colors: ${hexes.join(', ')}`)}
+        />
       </div>
 
       <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_320px]">

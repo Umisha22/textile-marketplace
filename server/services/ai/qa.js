@@ -72,6 +72,15 @@ export function answerAboutProduct(text, product, currency = 'USD') {
         : `This is a ${product.fabricType || 'finished'} fabric with a ${product.category} character.`
     );
   }
+  if (/eco|sustainab|organic|recycled|environment|green|footprint/.test(t)) {
+    const s = product.sustainability;
+    if (s && s.score) {
+      const badges = s.badges?.length ? ` Badges: ${s.badges.join(', ')}.` : '';
+      out.push(`Eco score ${s.score}/100.${badges} ${s.note || ''}`);
+    } else {
+      out.push('No sustainability profile is listed for this fabric yet.');
+    }
+  }
 
   if (!out.length) {
     out.push(

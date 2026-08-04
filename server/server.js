@@ -10,6 +10,7 @@ import cartRoutes from './routes/cart.js';
 import orderRoutes from './routes/orders.js';
 import supplierRoutes from './routes/supplier.js';
 import aiRoutes from './routes/ai.js';
+import recommendationRoutes from './routes/recommendations.js';
 import { notFound, errorHandler } from './middleware/error.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -27,6 +28,7 @@ app.use('/api/cart', cartRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/supplier', supplierRoutes);
 app.use('/api/ai', aiRoutes);
+app.use('/api/recommendations', recommendationRoutes);
 
 // Serve built client in production.
 const clientDist = path.resolve(__dirname, '../client/dist');

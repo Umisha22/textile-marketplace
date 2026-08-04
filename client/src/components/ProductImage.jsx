@@ -1,3 +1,6 @@
+import { useState } from 'react';
+import { fabricImage } from '../utils/fabricImages.js';
+
 const PALETTES = [
   ['#0f3d3e', '#347e75'],
   ['#6c2a23', '#c1442e'],
@@ -9,7 +12,8 @@ const PALETTES = [
   ['#bf360c', '#ff8a65'],
 ];
 
-const SHEEN = new Set(['satin', 'silk', 'chiffon', 'georgette', 'organza', 'taffeta']);
+const SHEEN_TYPES = new Set(['silk', 'satin', 'taffeta', 'organza', 'georgette', 'chiffon']);
+const MESH_TYPES = new Set(['chiffon', 'georgette', 'organza', 'lace']);
 
 const hashString = (s = '') => {
   let h = 0;
@@ -17,161 +21,295 @@ const hashString = (s = '') => {
   return Math.abs(h);
 };
 
-const hexToRgb = (hex = '#000') => {
-  const full = hex.replace('#', '');
+const hexToRgb = (hex = '#8a8a8a') => {
+  const full = hex.replace('#', '').trim();
   const h = full.length === 3 ? full.split('').map((c) => c + c).join('') : full;
-  const n = parseInt(h || '0', 16);
+  const n = parseInt(h || '8a8a8a', 16);
   return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 };
 };
 
-const light = (c, a = 0.18) => `rgba(255,255,255,${a})`;
-const dark = (c, a = 0.16) => `rgba(${c.r},${c.g},${c.b},${a})`;
+const toHex = (c) =>
+  `#${[c.r, c.g, c.b].map((v) => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, '0')).join('')}`;
 
-const weaveBody = (c, lw = 1.2) => `
-  <line x1='0' y1='2' x2='8' y2='2' stroke='${light(c, 0.22)}' stroke-width='${lw}'/>
-  <line x1='0' y1='6' x2='8' y2='6' stroke='${dark(c, 0.18)}' stroke-width='${lw}'/>
-  <line x1='2' y1='0' x2='2' y2='8' stroke='${light(c, 0.22)}' stroke-width='${lw}'/>
-  <line x1='6' y1='0' x2='6' y2='8' stroke='${dark(c, 0.18)}' stroke-width='${lw}'/>`;
-
-const patterns = {
-  knit: { tile: 16, body: (c) => `
-    <path d='M2 2 q2 -2 4 0 q2 2 4 0' stroke='${light(c, 0.35)}' stroke-width='1.7' fill='none'/>
-    <path d='M2 9 q2 -2 4 0 q2 2 4 0' stroke='${light(c, 0.2)}' stroke-width='1.7' fill='none'/>
-    <path d='M10 2 q2 -2 4 0 q2 2 4 0' stroke='${light(c, 0.3)}' stroke-width='1.7' fill='none'/>
-    <path d='M10 9 q2 -2 4 0 q2 2 4 0' stroke='${light(c, 0.17)}' stroke-width='1.7' fill='none'/>` },
-  twill: { tile: 12, body: (c) => `
-    <path d='M-3 3 L15 -9' stroke='${light(c, 0.3)}' stroke-width='2.3'/>
-    <path d='M-3 7 L15 -5' stroke='${dark(c, 0.22)}' stroke-width='2.3'/>
-    <path d='M-3 11 L15 -1' stroke='${light(c, 0.3)}' stroke-width='2.3'/>` },
-  canvas: { tile: 20, body: (c) => `
-    <rect x='0' y='0' width='20' height='6' fill='${light(c, 0.16)}'/>
-    <rect x='0' y='11' width='20' height='6' fill='${dark(c, 0.12)}'/>
-    <rect x='0' y='0' width='6' height='20' fill='${dark(c, 0.12)}'/>
-    <rect x='11' y='0' width='6' height='20' fill='${light(c, 0.16)}'/>` },
-  crepe: { tile: 14, body: (c) => `
-    <circle cx='4' cy='4' r='1.6' fill='${light(c, 0.3)}'/>
-    <circle cx='11' cy='11' r='1.6' fill='${dark(c, 0.25)}'/>
-    <circle cx='11' cy='4' r='1.1' fill='${dark(c, 0.2)}'/>
-    <circle cx='4' cy='11' r='1.1' fill='${light(c, 0.22)}'/>` },
-  jacquard: { tile: 32, body: (c) => `
-    <path d='M16 4 L24 12 L16 20 L8 12 Z' stroke='${light(c, 0.3)}' stroke-width='1.4' fill='none'/>
-    <circle cx='16' cy='12' r='2.4' stroke='${light(c, 0.22)}' stroke-width='1.2' fill='none'/>
-    <circle cx='8' cy='28' r='3' stroke='${light(c, 0.16)}' stroke-width='1.2' fill='none'/>
-    <circle cx='24' cy='28' r='3' stroke='${light(c, 0.16)}' stroke-width='1.2' fill='none'/>` },
-  velvet: { tile: 12, body: (c) => `
-    <rect x='0' y='0' width='4' height='12' fill='${light(c, 0.14)}'/>
-    <rect x='8' y='0' width='4' height='12' fill='${light(c, 0.1)}'/>` },
-  lace: { tile: 24, body: (c) => `
-    <circle cx='12' cy='12' r='4' stroke='${light(c, 0.4)}' stroke-width='1.3' fill='none'/>
-    <circle cx='0' cy='0' r='3' stroke='${light(c, 0.28)}' stroke-width='1.2' fill='none'/>
-    <circle cx='24' cy='24' r='3' stroke='${light(c, 0.28)}' stroke-width='1.2' fill='none'/>
-    <line x1='0' y1='12' x2='8' y2='12' stroke='${light(c, 0.3)}' stroke-width='1.1'/>
-    <line x1='16' y1='12' x2='24' y2='12' stroke='${light(c, 0.3)}' stroke-width='1.1'/>` },
+const lum = (hex) => {
+  const c = hexToRgb(hex);
+  return (0.299 * c.r + 0.587 * c.g + 0.114 * c.b) / 255;
 };
 
-const patternFor = (fabricType, c) => {
-  if (patterns[fabricType]) return patterns[fabricType].body(c);
-  if (fabricType === 'denim' || fabricType === 'twill') return patterns.twill.body(c);
-  if (fabricType === 'canvas') return patterns.canvas.body(c);
-  if (fabricType === 'velvet') return patterns.velvet.body(c);
-  if (fabricType === 'crepe') return patterns.crepe.body(c);
-  if (fabricType === 'jacquard' || fabricType === 'embroidery') return patterns.jacquard.body(c);
-  if (fabricType === 'lace') return patterns.lace.body(c);
-  if (fabricType === 'knit' || fabricType === 'jersey') return patterns.knit.body(c);
-  return weaveBody(c);
+// Mix hex with black (amt<0) or white (amt>0).
+const mix = (hex, amt) => {
+  const c = hexToRgb(hex);
+  const f = amt < 0 ? 0 : 255;
+  const p = Math.abs(amt);
+  return toHex({ r: (f - c.r) * p + c.r, g: (f - c.g) * p + c.g, b: (f - c.b) * p + c.b });
 };
 
-const tileFor = (fabricType) => {
-  if (patterns[fabricType]) return patterns[fabricType].tile;
-  if (['denim', 'twill'].includes(fabricType)) return 12;
-  if (fabricType === 'canvas') return 20;
-  if (fabricType === 'velvet') return 12;
-  if (fabricType === 'crepe') return 14;
-  if (['jacquard', 'embroidery'].includes(fabricType)) return 32;
-  if (fabricType === 'lace') return 24;
-  if (['knit', 'jersey'].includes(fabricType)) return 16;
-  return 8;
-};
+const white = (hex, a) => `rgba(255,255,255,${a})`;
+const black = (hex, a) => `rgba(0,0,0,${a})`;
 
-const pickBase = (product, seed) => {
-  const colorHex = product?.colors?.[0]?.hex;
-  if (colorHex && /^#?[0-9a-f]{3,8}$/i.test(colorHex)) return `#${colorHex.replace('#', '')}`;
+function patternFor(type, hex) {
+  const dark = lum(hex) > 0.55;
+  const L1 = dark ? white(hex, 0.28) : white(hex, 0.16);
+  const D1 = dark ? black(hex, 0.22) : black(hex, 0.18);
+  const D2 = dark ? black(hex, 0.1) : black(hex, 0.08);
+
+  switch (type) {
+    case 'silk':
+    case 'satin':
+    case 'taffeta':
+      // Satin weave: long horizontal floats catching light.
+      return {
+        tile: 12,
+        body: `
+          <rect x='0' y='1' width='12' height='1.4' fill='${L1}'/>
+          <rect x='0' y='6.5' width='12' height='1.2' fill='${D2}'/>
+          <rect x='0' y='11' width='12' height='0.8' fill='${L1}'/>
+          <line x1='0' y1='3.6' x2='12' y2='3.6' stroke='${D1}' stroke-width='0.5'/>`,
+      };
+    case 'chiffon':
+    case 'georgette':
+    case 'organza':
+      // Translucent gauze: fine open mesh.
+      return {
+        tile: 10,
+        body: `
+          <rect x='0' y='0' width='10' height='10' fill='none' stroke='${D1}' stroke-width='0.7'/>
+          <line x1='0' y1='5' x2='10' y2='5' stroke='${L1}' stroke-width='0.5'/>
+          <line x1='5' y1='0' x2='5' y2='10' stroke='${L1}' stroke-width='0.5'/>`,
+      };
+    case 'twill':
+      return {
+        tile: 14,
+        body: `
+          <path d='M-4 4 L18 -8' stroke='${L1}' stroke-width='2.6'/>
+          <path d='M-4 8 L18 -4' stroke='${D1}' stroke-width='2.6'/>
+          <path d='M-4 12 L18 0' stroke='${L1}' stroke-width='2.6'/>`,
+      };
+    case 'denim':
+      return {
+        tile: 14,
+        body: `
+          <path d='M-4 4 L18 -8' stroke='${L1}' stroke-width='2.6'/>
+          <path d='M-4 8 L18 -4' stroke='${D1}' stroke-width='2.6'/>
+          <circle cx='5' cy='10' r='0.9' fill='${white(hex, 0.35)}'/>
+          <circle cx='11' cy='3' r='0.7' fill='${black(hex, 0.3)}'/>
+          <circle cx='2' cy='2' r='0.8' fill='${white(hex, 0.3)}'/>`,
+      };
+    case 'canvas':
+      return {
+        tile: 22,
+        body: `
+          <rect x='0' y='0' width='22' height='7' fill='${L1}'/>
+          <rect x='0' y='12' width='22' height='7' fill='${D1}'/>
+          <rect x='0' y='0' width='7' height='22' fill='${D1}'/>
+          <rect x='12' y='0' width='7' height='22' fill='${L1}'/>`,
+      };
+    case 'knit':
+      return {
+        tile: 18,
+        body: `
+          <path d='M3 2 q2.5 -2.6 5 0 q2.5 2.6 5 0' stroke='${L1}' stroke-width='1.8' fill='none'/>
+          <path d='M3 9.5 q2.5 -2.6 5 0 q2.5 2.6 5 0' stroke='${D1}' stroke-width='1.8' fill='none'/>
+          <path d='M3 17 q2.5 -2.6 5 0 q2.5 2.6 5 0' stroke='${L1}' stroke-width='1.8' fill='none'/>`,
+      };
+    case 'velvet':
+      return {
+        tile: 10,
+        body: `
+          <rect x='0' y='0' width='3.4' height='10' fill='${L1}'/>
+          <rect x='6.6' y='0' width='3.4' height='10' fill='${D2}'/>`,
+      };
+    case 'crepe':
+      return {
+        tile: 12,
+        body: `
+          <circle cx='3' cy='3' r='1.7' fill='${D1}'/>
+          <circle cx='9' cy='9' r='1.7' fill='${L1}'/>
+          <circle cx='9' cy='3' r='1.1' fill='${L1}'/>
+          <circle cx='3' cy='9' r='1.1' fill='${D1}'/>`,
+      };
+    case 'jacquard':
+      return {
+        tile: 36,
+        body: `
+          <path d='M18 6 L26 14 L18 22 L10 14 Z' stroke='${L1}' stroke-width='1.6' fill='none'/>
+          <path d='M18 12 L23 17 L18 22 L13 17 Z' fill='${D2}'/>
+          <circle cx='6' cy='30' r='3.4' stroke='${D1}' stroke-width='1.3' fill='none'/>
+          <circle cx='30' cy='30' r='3.4' stroke='${D1}' stroke-width='1.3' fill='none'/>`,
+      };
+    case 'lace':
+      return {
+        tile: 28,
+        body: `
+          <circle cx='14' cy='14' r='5' stroke='${L1}' stroke-width='1.6' fill='none'/>
+          <circle cx='14' cy='14' r='2' fill='${D2}'/>
+          <circle cx='0' cy='0' r='3.5' stroke='${L1}' stroke-width='1.4' fill='none'/>
+          <circle cx='28' cy='28' r='3.5' stroke='${L1}' stroke-width='1.4' fill='none'/>
+          <line x1='0' y1='14' x2='9' y2='14' stroke='${L1}' stroke-width='1.3'/>
+          <line x1='19' y1='14' x2='28' y2='14' stroke='${L1}' stroke-width='1.3'/>`,
+      };
+    case 'poplin':
+    case 'muslin':
+    case 'broadcloth':
+    case 'wool':
+      return {
+        tile: 8,
+        body: `
+          <line x1='0' y1='2' x2='8' y2='2' stroke='${L1}' stroke-width='1.3'/>
+          <line x1='0' y1='6' x2='8' y2='6' stroke='${D1}' stroke-width='1.3'/>
+          <line x1='2' y1='0' x2='2' y2='8' stroke='${L1}' stroke-width='1.3'/>
+          <line x1='6' y1='0' x2='6' y2='8' stroke='${D1}' stroke-width='1.3'/>`,
+      };
+    case 'blends':
+      return {
+        tile: 8,
+        body: `
+          <line x1='0' y1='2' x2='8' y2='2' stroke='${L1}' stroke-width='1.3'/>
+          <line x1='0' y1='6' x2='8' y2='6' stroke='${D1}' stroke-width='1.3'/>
+          <line x1='2' y1='0' x2='2' y2='8' stroke='${L1}' stroke-width='1.3'/>
+          <line x1='6' y1='0' x2='6' y2='8' stroke='${D1}' stroke-width='1.3'/>
+          <circle cx='1' cy='4' r='0.8' fill='${white(hex, 0.5)}'/>
+          <circle cx='5' cy='7' r='0.7' fill='${black(hex, 0.35)}'/>`,
+      };
+    default:
+      // Woven / linen: classic interlaced weave.
+      return {
+        tile: 8,
+        body: `
+          <line x1='0' y1='2' x2='8' y2='2' stroke='${L1}' stroke-width='1.4'/>
+          <line x1='0' y1='6' x2='8' y2='6' stroke='${D1}' stroke-width='1.4'/>
+          <line x1='2' y1='0' x2='2' y2='8' stroke='${L1}' stroke-width='1.4'/>
+          <line x1='6' y1='0' x2='6' y2='8' stroke='${D1}' stroke-width='1.4'/>`,
+      };
+  }
+}
+
+function folds(hex) {
+  const d = lum(hex) > 0.55;
+  return `
+    <path d='M-40 470 Q 150 300 240 470 Z' fill='${d ? black(hex, 0.1) : black(hex, 0.16)}'/>
+    <path d='M210 470 Q 400 260 640 470 Z' fill='${d ? black(hex, 0.07) : black(hex, 0.12)}'/>
+    <path d='M480 -30 Q 300 120 620 320 L 620 -30 Z' fill='${white(hex, d ? 0.14 : 0.1)}'/>`;
+}
+
+function buildSvg(fabricType, hex, seed) {
+  const p = patternFor(fabricType, hex);
+  const sheen = SHEEN_TYPES.has(fabricType);
+  const mesh = MESH_TYPES.has(fabricType);
+  const light = lum(hex) > 0.6;
+
+  return `<svg xmlns='http://www.w3.org/2000/svg' width='600' height='450' viewBox='0 0 600 450'>
+  <defs>
+    <linearGradient id='base' x1='0' y1='0' x2='0.35' y2='1'>
+      <stop offset='0%' stop-color='${mix(hex, light ? 0.08 : 0.14)}'/>
+      <stop offset='38%' stop-color='${hex}'/>
+      <stop offset='82%' stop-color='${mix(hex, -0.1)}'/>
+      <stop offset='100%' stop-color='${mix(hex, -0.22)}'/>
+    </linearGradient>
+    <radialGradient id='glow' cx='0.3' cy='0.25' r='1'>
+      <stop offset='0%' stop-color='${white(hex, light ? 0.3 : 0.22)}'/>
+      <stop offset='55%' stop-color='${white(hex, 0)}'/>
+      <stop offset='100%' stop-color='${black(hex, 0.12)}'/>
+    </radialGradient>
+    <linearGradient id='sheenBand' x1='0' y1='0' x2='0.8' y2='0.9'>
+      <stop offset='0%' stop-color='${white(hex, 0)}'/>
+      <stop offset='38%' stop-color='${white(hex, 0.05)}'/>
+      <stop offset='46%' stop-color='${white(hex, sheen ? 0.45 : 0.18)}'/>
+      <stop offset='54%' stop-color='${white(hex, sheen ? 0.3 : 0.1)}'/>
+      <stop offset='62%' stop-color='${white(hex, 0.04)}'/>
+      <stop offset='100%' stop-color='${white(hex, 0)}'/>
+    </linearGradient>
+    <linearGradient id='vignette' x1='0.5' y1='0.5' r='0.75'>
+    </linearGradient>
+    <radialGradient id='vig' cx='0.5' cy='0.45' r='0.75'>
+      <stop offset='0%' stop-color='${black(hex, 0)}'/>
+      <stop offset='78%' stop-color='${black(hex, 0.03)}'/>
+      <stop offset='100%' stop-color='${black(hex, 0.28)}'/>
+    </radialGradient>
+    <pattern id='tex' width='${p.tile}' height='${p.tile}' patternUnits='userSpaceOnUse'>
+      <rect width='${p.tile}' height='${p.tile}' fill='none'/>
+      ${p.body}
+    </pattern>
+    <filter id='grain'>
+      <feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/>
+      <feColorMatrix type='matrix' values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.5 0'/>
+    </filter>
+    <filter id='softBlur' x='-20%' y='-20%' width='140%' height='140%'>
+      <feGaussianBlur stdDeviation='14'/>
+    </filter>
+  </defs>
+
+  <rect width='600' height='450' fill='url(#base)'/>
+  ${mesh ? `<rect width='600' height='450' fill='${white(hex, 0.18)}'/>` : ''}
+  <rect width='600' height='450' fill='url(#tex)'/>
+  <rect width='600' height='450' fill='url(#glow)'/>
+  ${sheen ? `<rect width='600' height='450' fill='url(#sheenBand)'/>` : ''}
+
+  <g filter='url(#softBlur)'>${folds(hex)}</g>
+
+  <rect width='600' height='450' filter='url(#grain)' opacity='${light ? 0.5 : 0.42}'/>
+  <rect width='600' height='450' fill='url(#sheenBand)' opacity='${sheen ? 1 : 0.35}'/>
+  <rect width='600' height='450' fill='url(#vig)'/>
+  <rect x='0.5' y='0.5' width='599' height='449' fill='none' stroke='${black(hex, 0.14)}' stroke-width='1'/>
+</svg>`;
+}
+
+const pickHex = (product, seed, colorProp) => {
+  if (colorProp) {
+    const isHex = /^#?[0-9a-f]{3,8}$/i.test(String(colorProp).trim());
+    if (isHex) return `#${String(colorProp).trim().replace('#', '')}`;
+    const byName = (product?.colors || []).find((c) => c.name.toLowerCase() === String(colorProp).toLowerCase());
+    if (byName?.hex) return `#${byName.hex.replace('#', '')}`;
+  }
+  const first = product?.colors?.[0]?.hex;
+  if (first && /^#?[0-9a-f]{3,8}$/i.test(first)) return `#${first.replace('#', '')}`;
   const palette = PALETTES[seed % PALETTES.length];
   return palette[seed % 2];
 };
 
-function buildSvg(product, seed) {
-  const fabricType = product?.fabricType || '';
-  const base = pickBase(product, seed);
-  const c = hexToRgb(base);
-  const tile = tileFor(fabricType);
-  const patternBody = patternFor(fabricType, c);
-  const sheen = SHEEN.has(fabricType);
-
-  return `<svg xmlns='http://www.w3.org/2000/svg' width='600' height='450'>
-  <defs>
-    <linearGradient id='bg' x1='0' y1='0' x2='1' y2='1'>
-      <stop offset='0%' stop-color='${base}'/>
-      <stop offset='55%' stop-color='${base}'/>
-      <stop offset='100%' stop-color='${shade(base, 0.22)}'/>
-    </linearGradient>
-    <pattern id='p' width='${tile}' height='${tile}' patternUnits='userSpaceOnUse'>
-      <rect width='${tile}' height='${tile}' fill='none'/>
-      ${patternBody}
-    </pattern>
-    <filter id='grain'>
-      <feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/>
-      <feColorMatrix type='matrix' values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.55 0'/>
-      <feComposite operator='over' in2='SourceGraphic'/>
-    </filter>
-    ${sheen ? `<linearGradient id='sheen' x1='0' y1='0' x2='1' y2='0'>
-      <stop offset='0%' stop-color='white' stop-opacity='0'/>
-      <stop offset='42%' stop-color='white' stop-opacity='0.28'/>
-      <stop offset='50%' stop-color='white' stop-opacity='0.4'/>
-      <stop offset='60%' stop-color='white' stop-opacity='0.22'/>
-      <stop offset='100%' stop-color='white' stop-opacity='0'/>
-    </linearGradient>` : ''}
-  </defs>
-  <rect width='600' height='450' fill='url(#bg)'/>
-  <rect width='600' height='450' fill='url(#p)'/>
-  <rect width='600' height='450' filter='url(#grain)' opacity='0.5'/>
-  ${sheen ? `<rect width='600' height='450' fill='url(#sheen)'/>` : ''}
-  <rect x='0' y='0' width='600' height='450' fill='none' stroke='rgba(0,0,0,0.08)' stroke-width='1'/>
-</svg>`;
-}
-
-function shade(hex, amt) {
-  const c = hexToRgb(hex);
-  const f = amt < 0 ? 0 : 255;
-  const p = Math.abs(amt);
-  const mix = (v) => Math.round((f - v) * p + v);
-  return `rgb(${mix(c.r)},${mix(c.g)},${mix(c.b)})`;
-}
-
 /**
- * Renders a product image. Uses a stored image URL when available,
- * otherwise draws a realistic fabric texture matched to the fabric type.
+ * Renders a product image.
+ * - Uses a stored image URL when available (`src` or `product.images[0]`).
+ * - Otherwise uses a real fabric-type photo when one is mapped.
+ * - Falls back to a photorealistic SVG fabric texture for any fabric type.
+ * - `color` (hex or color name) recolors the fabric — when a real photo is
+ *   shown it is recolored via a color-blend overlay; the SVG version is fully recolored.
  */
-export default function ProductImage({ product, src, alt, className = '', rounded = true }) {
-  const url = src || product?.images?.[0];
+export default function ProductImage({ product, src, alt, className = '', rounded = true, color }) {
+  const [imgFailed, setImgFailed] = useState(false);
 
-  if (url) {
+  const url = src || product?.images?.[0] || fabricImage(product?.fabricType);
+
+  if (url && !imgFailed) {
+    const tint = color
+      ? /^#?[0-9a-f]{3,8}$/i.test(String(color).trim())
+        ? `#${String(color).trim().replace('#', '')}`
+        : product?.colors?.find((c) => c.name.toLowerCase() === String(color).toLowerCase())?.hex
+      : null;
+
     return (
-      <img
-        src={url}
-        alt={alt || product?.name || 'Product'}
-        loading="lazy"
-        className={`${rounded ? 'rounded-xl' : ''} h-full w-full object-cover ${className}`}
-        onError={(e) => {
-          e.currentTarget.style.display = 'none';
-          e.currentTarget.nextElementSibling?.classList.remove('hidden');
-        }}
-      />
+      <div className={`${rounded ? 'rounded-xl' : ''} relative h-full w-full overflow-hidden ${className}`}>
+        <img
+          src={url}
+          alt={alt || product?.name || 'Product'}
+          loading="lazy"
+          className="h-full w-full object-cover"
+          onError={() => setImgFailed(true)}
+        />
+        {tint && (
+          <div
+            className="pointer-events-none absolute inset-0"
+            style={{ backgroundColor: tint, mixBlendMode: 'color', opacity: 0.95 }}
+          />
+        )}
+      </div>
     );
   }
 
   const seed = hashString(`${product?.name}-${product?.fabricType || ''}-${product?.category || ''}`);
-  const dataUri = `data:image/svg+xml;utf8,${encodeURIComponent(buildSvg(product, seed))}`;
+  const hex = pickHex(product, seed, color);
+  const fabricType = product?.fabricType || 'woven';
+  const dataUri = `data:image/svg+xml;utf8,${encodeURIComponent(buildSvg(fabricType, hex, seed))}`;
 
   return (
     <div

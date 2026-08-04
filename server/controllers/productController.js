@@ -6,12 +6,27 @@ import { PRODUCT_CATEGORIES, FABRIC_TYPES } from '../constants.js';
 
 const PAGE_SIZE = 12;
 
+const hexToRgb = (hex = '#888888') => {
+  const h = hex.replace('#', '').trim();
+  const full = h.length === 3 ? h.split('').map((c) => c + c).join('') : h;
+  const n = parseInt(full || '888888', 16);
+  return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 };
+};
+
+const colorDistance = (a, b) => {
+  const dr = a.r - b.r;
+  const dg = a.g - b.g;
+  const db = a.b - b.b;
+  return Math.sqrt(dr * dr + dg * dg + db * db);
+};
+
 export const listProducts = asyncHandler(async (req, res) => {
   const {
     search,
     category,
     fabricType,
     color,
+    colorHex,
     minPrice,
     maxPrice,
     supplier,
@@ -59,6 +74,48 @@ export const listProducts = asyncHandler(async (req, res) => {
     popular: { featured: -1, stock: -1 },
     stock: { stock: -1 },
   };
+
+  if (colorHex) {
+    const hexes = colorHex
+      .split(',')
+      .map((h) => h.trim())
+      .filter((h) => /^#?[0-9a-fA-F]{6}$/.test(h))
+      .map(hexToRgb);
+    if (hexes.length) {
+      const candidates = await Product.find(query)
+        .populate('supplier', 'name avatar supplierProfile')
+        .sort(sortOptions[sort] || sortOptions.newest)
+        .limit(200)
+        .lean();
+      const ranked = candidates
+        .map((p) => {
+          const colors = p.colors || [];
+          if (!colors.length) return { p, d: Number.POSITIVE_INFINITY };
+          const d = Math.min(
+            ...colors.map((c) => {
+              const cRgb = hexToRgb(c.hex);
+              return Math.min(...hexes.map((h) => colorDistance(cRgb, h)));
+            })
+          );
+          return { p, d };
+        })
+        .filter((x) => Number.isFinite(x.d))
+        .sort((a, b) => a.d - b.d);
+      const pageNum = Number(page);
+      const pageSize = Number(limit);
+      const sliced = ranked.slice((pageNum - 1) * pageSize, pageNum * pageSize);
+      return res.json({
+        products: sliced.map((x) => x.p),
+        pagination: {
+          page: pageNum,
+          limit: pageSize,
+          total: ranked.length,
+          pages: Math.max(1, Math.ceil(ranked.length / pageSize)),
+        },
+        colorRanked: true,
+      });
+    }
+  }
 
   const total = await Product.countDocuments(query);
   const products = await Product.find(query)

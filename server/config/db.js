@@ -39,7 +39,9 @@ function systemDnsServers() {
   const current = dns.getServers();
   const healthy = current.filter((s) => !isBrokenServer(s));
   const discovered = systemDnsServers().filter((s) => !isBrokenServer(s));
-  const next = [...new Set([...healthy, ...discovered])];
+  // Public fallbacks are appended last so they only kick in if the system
+  // resolver fails to resolve the Atlas SRV records.
+  const next = [...new Set([...healthy, ...discovered, '1.1.1.1', '8.8.8.8'])];
   if (next.length && JSON.stringify(next) !== JSON.stringify(current)) {
     try {
       dns.setServers(next);
@@ -50,18 +52,53 @@ function systemDnsServers() {
   }
 })();
 
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const CONNECT_OPTIONS = {
+  serverSelectionTimeoutMS: 20000,
+  connectTimeoutMS: 20000,
+  socketTimeoutMS: 45000,
+  retryWrites: true,
+};
+
 export async function connectDB() {
-  try {
-    const conn = await mongoose.connect(MONGO_URI, {
-      serverSelectionTimeoutMS: 8000,
-    });
-    console.log(`MongoDB connected: ${conn.connection.host}`);
-    return conn;
-  } catch (err) {
-    console.error('MongoDB connection failed:', err.message);
-    console.error(
-      'Hint: create a free cluster at https://www.mongodb.com/cloud/atlas and set MONGO_URI in server/.env'
-    );
-    process.exit(1);
+  const MAX_ATTEMPTS = 6;
+  let lastErr;
+
+  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+    try {
+      const conn = await mongoose.connect(MONGO_URI, CONNECT_OPTIONS);
+      console.log(`MongoDB connected: ${conn.connection.host}`);
+      return conn;
+    } catch (err) {
+      lastErr = err;
+      if (attempt < MAX_ATTEMPTS) {
+        console.log(
+          `MongoDB connection attempt ${attempt}/${MAX_ATTEMPTS} failed (${err.message}). Retrying in 4s…`
+        );
+        // Re-discover working resolvers between attempts — Atlas DNS or the
+        // network may have recovered in the meantime.
+        try {
+          const next = [
+            ...new Set([
+              ...dns.getServers().filter((s) => !isBrokenServer(s)),
+              ...systemDnsServers().filter((s) => !isBrokenServer(s)),
+              '1.1.1.1',
+              '8.8.8.8',
+            ]),
+          ];
+          dns.setServers(next);
+        } catch {
+          /* keep current resolvers */
+        }
+        await sleep(4000);
+      }
+    }
   }
+
+  console.error('MongoDB connection failed:', lastErr.message);
+  console.error(
+    'Hint: if retries keep failing, whitelist your current IP (or 0.0.0.0/0) under Atlas → Network Access.'
+  );
+  process.exit(1);
 }

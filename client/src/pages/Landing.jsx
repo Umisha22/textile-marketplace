@@ -2,25 +2,29 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../api/client.js';
 import ProductCard from '../components/ProductCard.jsx';
-import { CATEGORY_LABELS } from '../utils/constants.js';
+import FabricIcon from '../components/FabricIcon.jsx';
+import { useAuth } from '../context/AuthContext.jsx';
+import { CATEGORY_LABELS, FABRIC_TYPE_LABELS } from '../utils/constants.js';
 
-const CATEGORY_ART = {
-  cotton: '☁️',
-  silk: '✨',
-  linen: '🌾',
-  wool: '🐑',
-  denim: '🟦',
-  polyester: '⚡',
-  viscose: '🌀',
-  blends: '🪢',
-  lace: '🕸️',
-  embroidery: '🌼',
-  technical: '🛡️',
+const CATEGORY_ICON = {
+  cotton: 'poplin',
+  silk: 'silk',
+  linen: 'woven',
+  wool: 'broadcloth',
+  denim: 'denim',
+  polyester: 'satin',
+  viscose: 'crepe',
+  blends: 'blends',
+  lace: 'lace',
+  embroidery: 'jacquard',
+  technical: 'twill',
 };
 
 export default function Landing() {
+  const { user } = useAuth();
   const [featured, setFeatured] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [recommended, setRecommended] = useState([]);
   const [stats, setStats] = useState({ supplierCount: 0 });
   const [search, setSearch] = useState('');
   const navigate = useNavigate();
@@ -38,6 +42,17 @@ export default function Landing() {
       })
       .catch(() => {});
   }, []);
+
+  useEffect(() => {
+    if (user?.role !== 'buyer') {
+      setRecommended([]);
+      return;
+    }
+    api
+      .get('/recommendations')
+      .then((d) => setRecommended(d.recommendedProducts || []))
+      .catch(() => setRecommended([]));
+  }, [user]);
 
   const submitSearch = (e) => {
     e.preventDefault();
@@ -94,8 +109,8 @@ export default function Landing() {
                   to={`/products/${p.slug}`}
                   className={`group overflow-hidden rounded-2xl border border-brand-700/60 bg-brand-900/70 backdrop-blur transition hover:-translate-y-1 ${i % 2 === 1 ? 'translate-y-6' : ''}`}
                 >
-                  <div className="flex h-40 items-center justify-center bg-gradient-to-br from-brand-700 to-brand-900 text-6xl">
-                    {CATEGORY_ART[p.category] || '🧵'}
+                  <div className="flex h-40 items-center justify-center bg-gradient-to-br from-brand-700 to-brand-900 text-clay-300">
+                    <FabricIcon fabricType={p.fabricType || CATEGORY_ICON[p.category]} className="h-16 w-16" />
                   </div>
                   <div className="p-4">
                     <p className="text-sm font-semibold text-white">{p.name}</p>
@@ -144,13 +159,35 @@ export default function Landing() {
               to={`/products?category=${c.name}`}
               className="group rounded-2xl border border-brand-100 bg-white p-5 text-center shadow-soft transition hover:-translate-y-1 hover:border-brand-300 hover:shadow-lift"
             >
-              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-brand-50 text-2xl transition group-hover:bg-brand-100">
-                {CATEGORY_ART[c.name] || '🧵'}
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-brand-50 text-brand-700 transition group-hover:bg-brand-100">
+                <FabricIcon fabricType={CATEGORY_ICON[c.name] || 'woven'} className="h-6 w-6" />
               </div>
               <p className="mt-3 font-display text-sm font-semibold text-brand-900">{CATEGORY_LABELS[c.name] || c.name}</p>
               <p className="mt-0.5 text-xs text-brand-400">{c.count} products</p>
             </Link>
           ))}
+        </div>
+      </section>
+
+      {/* Fabric types */}
+      <section className="border-t border-brand-100 bg-white">
+        <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6">
+          <div className="text-center">
+            <p className="text-xs font-semibold uppercase tracking-widest text-clay-500">By fabric type</p>
+            <h2 className="mt-2 font-display text-3xl font-bold text-brand-900">Shop by weave & construction</h2>
+          </div>
+          <div className="mt-8 flex flex-wrap justify-center gap-3">
+            {Object.entries(FABRIC_TYPE_LABELS).map(([type, label]) => (
+              <Link
+                key={type}
+                to={`/products?fabricType=${type}`}
+                className="group flex items-center gap-2 rounded-full border border-brand-200 bg-cream-50 px-4 py-2.5 text-sm font-semibold text-brand-800 transition hover:-translate-y-0.5 hover:border-brand-400 hover:bg-brand-50"
+              >
+                <FabricIcon fabricType={type} className="h-5 w-5 text-brand-600 transition group-hover:text-brand-800" />
+                {label}
+              </Link>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -173,6 +210,28 @@ export default function Landing() {
           </div>
         </div>
       </section>
+
+      {/* Recommended for you */}
+      {user?.role === 'buyer' && recommended.length > 0 && (
+        <section className="border-t border-brand-100 bg-white py-14">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6">
+            <div className="flex items-end justify-between">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-widest text-clay-500">Personalized</p>
+                <h2 className="mt-2 font-display text-3xl font-bold text-brand-900">Recommended for you</h2>
+              </div>
+              <Link to="/assistant" className="text-sm font-semibold text-brand-700 hover:text-brand-900">
+                Ask Weaver AI →
+              </Link>
+            </div>
+            <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+              {recommended.slice(0, 4).map((p) => (
+                <ProductCard key={p.id || p._id} product={p} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* AI assistant promo */}
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6">

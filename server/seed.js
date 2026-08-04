@@ -411,6 +411,31 @@ async function seed() {
   const suppliers = [supplier, supplier2, supplier3];
   const products = [];
 
+  const sustainabilityFor = (data) => {
+    const name = `${data.name} ${(data.tags || []).join(' ')} ${data.composition || ''}`.toLowerCase();
+    const organic = /organic|gots|bci\b/.test(name);
+    const recycled = /recycled|recycled polyester|rpet/.test(name);
+    const base = {
+      cotton: 62, silk: 70, linen: 74, wool: 66, viscose: 52,
+      denim: 48, blends: 55, polyester: 38, lace: 58, embroidery: 58,
+      technical: 42,
+    }[data.category] || 50;
+    let score = base + (organic ? 18 : 0) + (recycled ? 14 : 0);
+    if (/poplin|muslin|broadcloth/.test(data.fabricType || '')) score += 4;
+    if (['satin', 'taffeta', 'velvet'].includes(data.fabricType || '')) score -= 4;
+    score = Math.max(30, Math.min(96, score));
+    const badges = [];
+    if (organic) badges.push('Organic certified');
+    if (recycled) badges.push('Recycled content');
+    if (['cotton', 'linen', 'silk', 'wool', 'viscose'].includes(data.category)) badges.push('OEKO-TEX certified');
+    if (['denim', 'silk'].includes(data.category)) badges.push('Low-water dyeing');
+    if (data.fabricType === 'jacquard') badges.push('Artisan woven');
+    const note =
+      `${organic ? 'Made from certified organic fibers. ' : ''}${recycled ? 'Contains verified recycled content. ' : ''}` +
+      `Estimated eco rating derived from fiber origin, dyeing process and manufacturing footprint.`;
+    return { score, recycled, organic, badges, note };
+  };
+
   for (let i = 0; i < PRODUCTS.length; i++) {
     const data = PRODUCTS[i];
     const supplierId =
@@ -439,6 +464,7 @@ async function seed() {
       stock: data.stock,
       moq: data.moq,
       tags: data.tags,
+      sustainability: sustainabilityFor(data),
       isActive: true,
       featured: data.featured,
     });
@@ -459,7 +485,8 @@ async function seed() {
     const status = statuses[i];
     const subtotal = Math.round((a.price * 200 + b.price * 150) * 100) / 100;
     const tax = Math.round(subtotal * 0.18 * 100) / 100;
-    const total = Math.round((subtotal + tax + 500) * 100) / 100;
+    const shipping = subtotal >= 500 ? 0 : 25;
+    const total = Math.round((subtotal + tax + shipping) * 100) / 100;
 
     await Order.create({
       orderNumber: `TM-DEMO-${1000 + i}`,
@@ -487,7 +514,7 @@ async function seed() {
       ],
       subtotal,
       tax,
-      shipping: 500,
+      shipping,
       total,
     });
   }

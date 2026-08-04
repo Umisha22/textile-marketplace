@@ -13,7 +13,7 @@ export default function CartPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  const shipping = subtotal >= 10000 ? 0 : 500;
+  const shipping = subtotal >= 500 ? 0 : 25;
   const tax = subtotal * 0.18;
   const total = subtotal + tax + shipping;
 
