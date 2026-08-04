@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { api, getToken, setToken, clearToken } from '../api/client.js';
+import { setCurrency } from '../utils/currency.js';
 import { useToast } from './ToastContext.jsx';
 
 const AuthContext = createContext(null);
@@ -17,7 +18,11 @@ export function AuthProvider({ children }) {
     }
     api
       .get('/auth/me')
-      .then((data) => setUser(data.user))
+      .then((data) => {
+        setUser(data.user);
+        const c = data.user?.buyerProfile?.currency || data.user?.supplierProfile?.currency;
+        if (c) setCurrency(c);
+      })
       .catch(() => clearToken())
       .finally(() => setLoading(false));
   }, []);
@@ -63,6 +68,8 @@ export function AuthProvider({ children }) {
   const refreshUser = useCallback(async () => {
     const data = await api.get('/auth/me');
     setUser(data.user);
+    const c = data.user?.buyerProfile?.currency || data.user?.supplierProfile?.currency;
+    if (c) setCurrency(c);
     return data.user;
   }, []);
 

@@ -3,6 +3,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
 import { Spinner } from '../components/ui.jsx';
+import Brand from '../components/Brand.jsx';
 
 export default function LoginPage() {
   const [params] = useSearchParams();
@@ -41,17 +42,11 @@ export default function LoginPage() {
     }
   };
 
-  const fillDemo = (roleType) => {
-    if (mode !== 'login') setMode('login');
-    setRole(roleType);
-    setForm({ name: '', email: roleType === 'supplier' ? 'supplier@demo.com' : 'buyer@demo.com', password: 'demo1234' });
-  };
-
   return (
     <div className="mx-auto flex max-w-md flex-col px-4 py-14">
       <div className="rounded-3xl border border-brand-100 bg-white p-8 shadow-lift">
         <div className="text-center">
-          <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-900 font-display text-xl font-bold text-cream-100">A</span>
+          <Brand className="mx-auto justify-center" />
           <h1 className="mt-4 font-display text-2xl font-bold text-brand-900">
             {mode === 'register' ? 'Create your account' : 'Welcome back'}
           </h1>
@@ -126,18 +121,6 @@ export default function LoginPage() {
             {mode === 'register' ? 'Create account' : 'Log in'}
           </button>
         </form>
-
-        <div className="mt-6 rounded-xl border border-dashed border-brand-200 bg-brand-50/60 p-4">
-          <p className="text-center text-xs font-semibold uppercase tracking-wider text-brand-500">Try the demo accounts</p>
-          <div className="mt-3 grid grid-cols-2 gap-2">
-            <button type="button" onClick={() => fillDemo('buyer')} className="rounded-lg border border-brand-200 bg-white px-3 py-2 text-xs font-semibold text-brand-700 hover:border-brand-400">
-              Buyer demo
-            </button>
-            <button type="button" onClick={() => fillDemo('supplier')} className="rounded-lg border border-brand-200 bg-white px-3 py-2 text-xs font-semibold text-brand-700 hover:border-brand-400">
-              Supplier demo
-            </button>
-          </div>
-        </div>
 
         <p className="mt-5 text-center text-sm text-brand-500">
           {mode === 'register' ? 'Already have an account?' : "New to Astra Threads?"}{' '}

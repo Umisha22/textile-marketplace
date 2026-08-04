@@ -7,8 +7,10 @@ import { useAuth } from '../context/AuthContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
 import { api } from '../api/client.js';
 import { formatPrice } from '../utils/format.js';
+import { useCurrency } from '../hooks/useCurrency.js';
 
 export default function CheckoutPage() {
+  useCurrency();
   const { items, subtotal, clear } = useCart();
   const { user } = useAuth();
   const { toast } = useToast();

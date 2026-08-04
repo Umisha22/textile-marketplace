@@ -92,6 +92,42 @@ export const INTENT_KEYWORDS = {
   help: ['help', 'what can you do', 'how do you work', 'capabilities', 'features', 'guide'],
 };
 
+export const ESTIMATE_KEYWORDS = [
+  'how much fabric', 'how much cloth', 'how many meters', 'how many metres',
+  'meters of fabric', 'metres of fabric', 'meters for', 'metres for',
+  'fabric required', 'fabric needed', 'cloth required', 'cloth needed',
+  'material required', 'material needed', 'fabric requirement', 'fabric estimate',
+  'estimate fabric', 'calculate', 'fabric calculator', 'dress material',
+  'measurements', 'body measurement', 'body measurements', 'body size',
+  'how much meter', 'how much metre', 'cutting length',
+];
+
+export const GARMENT_KEYWORDS = {
+  saree: ['saree', 'sari', 'sarees', 'saris'],
+  lehenga: ['lehenga', 'lehnga'],
+  anarkali: ['anarkali'],
+  gown: ['gown', 'evening gown', 'maxi'],
+  dress: ['dress', 'maxi dress', 'frock'],
+  kurta: ['kurta', 'kurti', 'kurtas', 'tunic', 'kameez'],
+  shirt: ['shirt', 'top', 'blouse', 'choli'],
+  salwar: ['salwar', 'shalwar'],
+  dupatta: ['dupatta', 'chunni', 'scarf', 'odhni'],
+  pajama: ['pajama', 'pyjama', 'trouser', 'pants', 'pant'],
+  skirt: ['skirt'],
+  jacket: ['jacket', 'blazer', 'coat', 'nehru'],
+};
+
+export const CURRENCY_WORDS = {
+  USD: ['dollar', 'usd', 'us$', '$'],
+  INR: ['rupee', 'rs', 'inr', '₹'],
+  EUR: ['euro', 'eur', '€'],
+  GBP: ['pound', 'gbp', '£'],
+  AED: ['dirham', 'aed', 'dhs', 'د.إ'],
+  JPY: ['yen', 'jpy', '¥'],
+  AUD: ['australian', 'aud'],
+  CAD: ['canadian', 'cad'],
+};
+
 export const QA_KEYWORDS = [
   'moq', 'minimum order', 'price', 'cost', 'stock', 'available', 'availability',
   'specification', 'specs', 'spec', 'composition', 'gsm', 'width', 'color',

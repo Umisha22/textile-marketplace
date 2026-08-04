@@ -4,8 +4,10 @@ import { api } from '../api/client.js';
 import { Spinner, StatusBadge } from '../components/ui.jsx';
 import { formatPrice, formatDateTime } from '../utils/format.js';
 import { ORDER_STATUSES } from '../utils/constants.js';
+import { useCurrency } from '../hooks/useCurrency.js';
 
 export default function OrderConfirmationPage() {
+  useCurrency();
   const { id } = useParams();
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);

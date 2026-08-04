@@ -13,6 +13,8 @@ export function notFound(req, res, next) {
 }
 
 export function errorHandler(err, req, res, next) {
+  console.error(`[error] ${req.method} ${req.originalUrl} ->`, err.stack || err);
+
   if (err.name === 'ValidationError') {
     const messages = Object.values(err.errors).map((e) => e.message);
     return res.status(400).json({ message: messages.join('. ') });

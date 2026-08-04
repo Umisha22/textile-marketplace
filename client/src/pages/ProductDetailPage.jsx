@@ -10,10 +10,12 @@ import { useAuth } from '../context/AuthContext.jsx';
 import { useNavigate } from 'react-router-dom';
 import { CATEGORY_LABELS, FABRIC_TYPE_LABELS } from '../utils/constants.js';
 import { formatPrice, formatNumber } from '../utils/format.js';
+import { useCurrency } from '../hooks/useCurrency.js';
 
 const QUICK_QUESTIONS = ['What is the MOQ?', 'Is it in stock?', 'What is the composition?', 'Delivery time?'];
 
 export default function ProductDetailPage() {
+  useCurrency();
   const { slug } = useParams();
   const [product, setProduct] = useState(null);
   const [similar, setSimilar] = useState([]);

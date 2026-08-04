@@ -1,9 +1,6 @@
-export const formatPrice = (n) =>
-  new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    maximumFractionDigits: n % 1 === 0 ? 0 : 2,
-  }).format(n);
+import { getCurrency, formatMoney } from './currency.js';
+
+export const formatPrice = (n) => formatMoney(n, getCurrency());
 
 export const formatDate = (d) =>
   new Date(d).toLocaleDateString('en-US', {

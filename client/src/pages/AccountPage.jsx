@@ -5,8 +5,10 @@ import { Spinner, StatusBadge, EmptyState } from '../components/ui.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { formatPrice, formatDate } from '../utils/format.js';
 import { CATEGORY_LABELS, BUSINESS_TYPE_LABELS, INDUSTRY_LABELS } from '../utils/constants.js';
+import { useCurrency } from '../hooks/useCurrency.js';
 
 export default function AccountPage() {
+  useCurrency();
   const { user } = useAuth();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);

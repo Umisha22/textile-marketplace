@@ -10,27 +10,32 @@ import {
 } from './engine.js';
 import { resolveProductReference, answerAboutProduct } from './qa.js';
 import { buildComparison, buildComparisonByIds } from './compare.js';
+import { estimateFabric, buildEstimateReply } from './fabricEstimate.js';
 import { augmentWithLLM } from './llm.js';
 import { handleOnboarding } from '../onboarding.js';
+import { formatPriceLine } from '../../utils/currency.js';
 
 const GREETING_REPLY = {
   reply:
-    "Namaste! I'm Weaver, your AI sourcing assistant. I can search our fabric catalog by natural language, recommend fabrics for your use case, compare products, and answer product questions. What are you sourcing today?",
+    "Namaste! I'm Weaver, your AI sourcing assistant. I can search our fabric catalog in natural language, recommend fabrics for a use case, compare products, answer product questions, and even estimate how much fabric you need for a garment from your body measurements. What are you sourcing today?",
   suggestions: [
     'Lightweight cotton under $5',
     'Silk for a summer dress line',
-    'Compare denim options',
+    'How much fabric for a kurta?',
     'What is the MOQ for cotton poplin?',
   ],
 };
 
 const HELP_REPLY = {
   reply:
-    'Here is what I can do:\n• Natural-language search — "organic cotton knits under $6"\n• Recommendations — "best fabric for bridal wear"\n• Compare — "compare the silk and satin options"\n• Similar products — "more like the jacquard"\n• Product Q&A — "What is the MOQ for velvet?"\n\nJust ask in plain English — or use the mic to speak!',
-  suggestions: ['Show me linen', 'Suggest winter fabrics', 'Help me find denim'],
+    'Here is what I can do:\n• Natural-language search — "organic cotton knits under $6"\n• Recommendations — "best fabric for bridal wear"\n• Compare — "compare the silk and satin options"\n• Similar products — "more like the jacquard"\n• Product Q&A — "What is the MOQ for velvet?"\n• Fabric estimator — "how much fabric for a kurta, chest 40, height 5\'4\\""\n\nJust ask in plain English — or use the mic to speak!',
+  suggestions: ['Show me linen', 'How much fabric for a saree?', 'Suggest winter fabrics'],
 };
 
-async function handleCompare(message, context) {
+const userCurrency = (user) =>
+  user?.buyerProfile?.currency || user?.supplierProfile?.currency || 'USD';
+
+async function handleCompare(message, context, currency) {
   const filters = extractFilters(message);
   let products = await findProducts(filters, 6);
 
@@ -53,7 +58,7 @@ async function handleCompare(message, context) {
 
   const selected = products.slice(0, 2);
   const compareData = await buildComparisonByIds(selected.map((p) => p.id));
-  const finalCompare = compareData || buildComparison(selected);
+  const finalCompare = compareData || buildComparison(selected, currency);
   return {
     intent: 'compare',
     reply: `Here's a side-by-side comparison of ${finalCompare.products.map((p) => p.name).join(' and ')}:`,
@@ -84,7 +89,7 @@ async function handleSimilar(message, context) {
   };
 }
 
-async function handleQA(message, context) {
+async function handleQA(message, context, currency) {
   const product = await resolveProductReference(message, context);
   if (!product) {
     const filters = extractFilters(message);
@@ -92,14 +97,14 @@ async function handleQA(message, context) {
     if (products.length) {
       return {
         intent: 'qa',
-        reply: `I found ${products.length} products that may answer your question:\n${products.map((p, i) => `${i + 1}. ${p.name} — $${p.price}/${p.unit}`).join('\n')}\n\nAsk me a specific question like "what is the MOQ?" and I'll dig into the details.`,
+        reply: `I found ${products.length} products that may answer your question:\n${products.map((p, i) => `${i + 1}. ${p.name} — ${formatPriceLine(p.price, p.unit, currency)}`).join('\n')}\n\nAsk me a specific question like "what is the MOQ?" and I'll dig into the details.`,
         products,
         suggestions: ['What is the MOQ?', 'Is it in stock?'],
       };
     }
     return { intent: 'qa', reply: "I couldn't find the product you're asking about. Try naming it or opening its page.", suggestions: ['Show me cotton shirts fabric'] };
   }
-  const answer = answerAboutProduct(message, product);
+  const answer = answerAboutProduct(message, product, currency);
   return {
     intent: 'qa',
     reply: answer,
@@ -109,7 +114,7 @@ async function handleQA(message, context) {
   };
 }
 
-async function handleSearchOrRecommend(message, context, user) {
+async function handleSearchOrRecommend(message, context, user, currency) {
   const filters = extractFilters(message);
   const hasExplicitFilters =
     filters.categories.length || filters.fabricTypes.length || filters.colors.length ||
@@ -123,12 +128,27 @@ async function handleSearchOrRecommend(message, context, user) {
   }
 
   const intent = hasExplicitFilters ? 'search' : 'recommend';
-  const built = buildReply(intent, products, filters);
+  const built = buildReply(intent, products, filters, currency);
   return { intent, ...built, products, context: { lastProducts: products.map((p) => p.id) } };
+}
+
+function handleEstimate(message) {
+  const estimate = estimateFabric(message);
+  return {
+    intent: 'estimate',
+    reply: buildEstimateReply(estimate),
+    estimate,
+    suggestions: [
+      'How much fabric for a saree?',
+      `Estimate a ${estimate.garmentName} for a 5'4" height`,
+      'How much for an anarkali?',
+    ],
+  };
 }
 
 export async function handleChatMessage({ text, user, role, context = {}, history = [] }) {
   const message = text.trim();
+  const currency = userCurrency(user);
 
   if (context.mode === 'onboarding') {
     return handleOnboarding({ text: message, user, context });
@@ -139,10 +159,11 @@ export async function handleChatMessage({ text, user, role, context = {}, histor
 
   if (intent === 'greeting') result = { intent, ...GREETING_REPLY, products: [] };
   else if (intent === 'help') result = { intent, ...HELP_REPLY, products: [] };
-  else if (intent === 'compare') result = await handleCompare(message, context);
+  else if (intent === 'compare') result = await handleCompare(message, context, currency);
   else if (intent === 'similar') result = await handleSimilar(message, context);
-  else if (intent === 'qa') result = await handleQA(message, context);
-  else result = await handleSearchOrRecommend(message, context, user);
+  else if (intent === 'estimate') result = handleEstimate(message);
+  else if (intent === 'qa') result = await handleQA(message, context, currency);
+  else result = await handleSearchOrRecommend(message, context, user, currency);
 
   const llmReply = await augmentWithLLM({
     message,
@@ -160,7 +181,7 @@ export async function handleRecommend(user) {
   const products = user?.buyerProfile
     ? await recommendProducts(user.buyerProfile, 6)
     : await findProducts({}, 6);
-  return { products, reply: buildReply('recommend', products, {}).reply };
+  return { products, reply: buildReply('recommend', products, {}, userCurrency(user)).reply };
 }
 
 export async function handleCompareByIds(ids) {

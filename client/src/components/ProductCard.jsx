@@ -2,8 +2,10 @@ import { Link } from 'react-router-dom';
 import ProductImage from './ProductImage.jsx';
 import { formatPrice } from '../utils/format.js';
 import { CATEGORY_LABELS } from '../utils/constants.js';
+import { useCurrency } from '../hooks/useCurrency.js';
 
 export default function ProductCard({ product, onCompareToggle, compareActive }) {
+  useCurrency();
   const out = product.stock <= 0;
   return (
     <div className="group relative flex flex-col overflow-hidden rounded-2xl border border-brand-100 bg-white shadow-soft transition hover:-translate-y-1 hover:shadow-lift">

@@ -1,4 +1,5 @@
 import Product from '../../models/Product.js';
+import { formatPriceLine, priceToUsd } from '../../utils/currency.js';
 import {
   CATEGORY_KEYWORDS,
   FABRIC_TYPE_KEYWORDS,
@@ -8,6 +9,8 @@ import {
   USE_CASE_KEYWORDS,
   INTENT_KEYWORDS,
   QA_KEYWORDS,
+  ESTIMATE_KEYWORDS,
+  GARMENT_KEYWORDS,
 } from './lexicon.js';
 
 const normalize = (text = '') => text.toLowerCase().trim();
@@ -18,6 +21,8 @@ export function detectIntent(text) {
   const t = normalize(text);
   if (containsAny(t, INTENT_KEYWORDS.compare)) return 'compare';
   if (containsAny(t, INTENT_KEYWORDS.similar)) return 'similar';
+  if (containsAny(t, ESTIMATE_KEYWORDS)) return 'estimate';
+  if (containsAny(t, GARMENT_KEYWORDS.saree) && /meter|metre|fabric|cloth|material|estimate|need|required|for a/.test(t)) return 'estimate';
   if (containsAny(t, INTENT_KEYWORDS.greeting)) return 'greeting';
   if (containsAny(t, INTENT_KEYWORDS.help)) return 'help';
   if (containsAny(t, QA_KEYWORDS)) return 'qa';
@@ -64,7 +69,7 @@ export function extractFilters(text) {
         else if (m[2].startsWith('h')) v *= 100;
         else if (m[2].startsWith('rs') || m[2].startsWith('inr')) v *= 1;
       }
-      return v;
+      return priceToUsd(v, t);
     })
     .filter((v) => !Number.isNaN(v));
 
@@ -207,10 +212,10 @@ export async function findByName(queryText, limit = 3) {
   return products.map(toProductBrief);
 }
 
-export function buildReply(intent, products, filters) {
+export function buildReply(intent, products, filters, currency = 'USD') {
   const names = products.map((p) => p.name);
   const list = products.length
-    ? products.map((p, i) => `${i + 1}. ${p.name} — $${p.price}/${p.unit}`).join('\n')
+    ? products.map((p, i) => `${i + 1}. ${p.name} — ${formatPriceLine(p.price, p.unit, currency)}`).join('\n')
     : '';
 
   if (!products.length) {
@@ -222,7 +227,7 @@ export function buildReply(intent, products, filters) {
   }
 
   let lead = '';
-  if (filters.categories.length || filters.fabricTypes.length) {
+  if (filters?.categories?.length || filters?.fabricTypes?.length) {
     lead = `Here are great matches for your request:`;
   } else if (intent === 'compare') {
     lead = `Here's what I found for comparison:`;

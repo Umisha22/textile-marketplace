@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useCart } from '../context/CartContext.jsx';
+import Brand from './Brand.jsx';
+import CurrencySwitcher from './CurrencySwitcher.jsx';
 
 const navLink = ({ isActive }) =>
   `rounded-lg px-3 py-2 text-sm font-medium transition ${
@@ -26,12 +28,7 @@ export default function Navbar() {
     <header className="sticky top-0 z-40 border-b border-brand-100 bg-cream-50/90 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
         <Link to={isSupplier ? '/supplier' : '/'} className="flex items-center gap-2.5">
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-900 font-display text-lg font-bold text-cream-100">
-            A
-          </span>
-          <span className="font-display text-xl font-semibold tracking-tight text-brand-900">
-            Astra Threads
-          </span>
+          <Brand />
         </Link>
 
         <nav className="hidden items-center gap-1 md:flex">
@@ -52,6 +49,7 @@ export default function Navbar() {
         </nav>
 
         <div className="flex items-center gap-2">
+          <CurrencySwitcher />
           {!isSupplier && (
             <Link
               to="/cart"

@@ -5,8 +5,10 @@ import { Spinner, StatusBadge, EmptyState } from '../../components/ui.jsx';
 import { useToast } from '../../context/ToastContext.jsx';
 import { formatPrice, formatDateTime } from '../../utils/format.js';
 import { ORDER_STATUSES } from '../../utils/constants.js';
+import { useCurrency } from '../../hooks/useCurrency.js';
 
 export default function SupplierOrders() {
+  useCurrency();
   const [params, setParams] = useSearchParams();
   const status = params.get('status') || '';
   const [orders, setOrders] = useState([]);

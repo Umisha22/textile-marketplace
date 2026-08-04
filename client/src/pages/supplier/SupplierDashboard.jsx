@@ -3,8 +3,10 @@ import { Link } from 'react-router-dom';
 import { api } from '../../api/client.js';
 import { Spinner, StatusBadge } from '../../components/ui.jsx';
 import { formatPrice, formatDate } from '../../utils/format.js';
+import { useCurrency } from '../../hooks/useCurrency.js';
 
 export default function SupplierDashboard() {
+  useCurrency();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
 

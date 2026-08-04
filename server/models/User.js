@@ -8,6 +8,7 @@ import {
   BUDGET_RANGES,
   OPERATING_HOURS,
 } from '../constants.js';
+import { CURRENCY_CODES } from '../utils/currency.js';
 
 const buyerProfileSchema = new mongoose.Schema(
   {
@@ -19,6 +20,7 @@ const buyerProfileSchema = new mongoose.Schema(
     budgetRange: { type: String, enum: BUDGET_RANGES },
     colorPreferences: [{ type: String }],
     notes: { type: String },
+    currency: { type: String, enum: CURRENCY_CODES, default: 'USD' },
   },
   { _id: false }
 );
@@ -40,6 +42,7 @@ const supplierProfileSchema = new mongoose.Schema(
     fabricTypes: [{ type: String }],
     moq: { type: Number },
     description: { type: String },
+    currency: { type: String, enum: CURRENCY_CODES, default: 'USD' },
   },
   { _id: false }
 );

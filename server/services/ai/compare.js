@@ -1,4 +1,5 @@
 import Product from '../../models/Product.js';
+import { formatPriceLine } from '../../utils/currency.js';
 
 export async function buildComparisonByIds(ids) {
   const products = [];
@@ -16,9 +17,9 @@ export async function buildComparisonByIds(ids) {
   return buildComparison(products);
 }
 
-export function buildComparison(products) {
+export function buildComparison(products, currency = 'USD') {
   const rows = [
-    { label: 'Price', get: (p) => `$${p.price} / ${p.unit}` },
+    { label: 'Price', get: (p) => formatPriceLine(p.price, p.unit, currency) },
     { label: 'Category', get: (p) => p.category },
     { label: 'Fabric type', get: (p) => p.fabricType || '—' },
     { label: 'Composition', get: (p) => p.specifications?.composition || '—' },

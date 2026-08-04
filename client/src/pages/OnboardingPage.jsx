@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
 import { api } from '../api/client.js';
 import { Spinner } from '../components/ui.jsx';
+import { CURRENCIES } from '../utils/currency.js';
 
 export default function OnboardingPage() {
   const { user, refreshUser } = useAuth();
@@ -107,13 +108,19 @@ function ManualOnboarding({ isSupplier, onDone }) {
     fabricTypes: [],
     typicalOrderQuantity: '500_2000',
     budgetRange: '50k_200k',
+    colorPreferences: [],
+    currency: 'USD',
     businessName: '',
+    contactEmail: '',
     contactPhone: '',
+    operatingHours: 'weekdays_9_6',
     moq: 100,
     description: '',
   });
 
   const set = (k) => (e) => setForm({ ...form, [k]: e.target.value });
+  const toggle = (k) => (v) =>
+    setForm({ ...form, [k]: form[k].includes(v) ? form[k].filter((x) => x !== v) : [...form[k], v] });
 
   const save = async () => {
     setSaving(true);
@@ -122,12 +129,14 @@ function ManualOnboarding({ isSupplier, onDone }) {
         ? {
             businessName: form.businessName,
             businessType: form.businessType,
+            contactEmail: form.contactEmail,
             contactPhone: form.contactPhone,
             categories: form.interests,
             fabricTypes: form.fabricTypes,
             moq: Number(form.moq),
             description: form.description,
-            operatingHours: 'weekdays_9_6',
+            operatingHours: form.operatingHours,
+            currency: form.currency,
           }
         : {
             businessType: form.businessType,
@@ -136,6 +145,8 @@ function ManualOnboarding({ isSupplier, onDone }) {
             fabricTypes: form.fabricTypes,
             typicalOrderQuantity: form.typicalOrderQuantity,
             budgetRange: form.budgetRange,
+            colorPreferences: form.colorPreferences,
+            currency: form.currency,
           };
       await api.put('/auth/profile', {
         [isSupplier ? 'supplierProfile' : 'buyerProfile']: profile,
@@ -149,22 +160,20 @@ function ManualOnboarding({ isSupplier, onDone }) {
     }
   };
 
-  const options = (list) =>
+  const options = (key) => (list) =>
     list.map((v) => (
       <label key={v} className="flex items-center gap-2 rounded-lg border border-brand-200 bg-cream-50 px-3 py-2 text-sm hover:border-brand-400">
         <input
           type="checkbox"
-          checked={form.interests.includes(v)}
-          onChange={(e) =>
-            setForm({
-              ...form,
-              interests: e.target.checked ? [...form.interests, v] : form.interests.filter((x) => x !== v),
-            })
-          }
+          checked={form[key].includes(v)}
+          onChange={(e) => toggle(key)(v)}
         />
         {v}
       </label>
     ));
+
+  const interestsOptions = options('interests');
+  const colorsOptions = options('colorPreferences');
 
   const inputCls = 'w-full rounded-xl border border-brand-200 bg-cream-50 px-4 py-2.5 text-sm outline-none focus:border-brand-400';
 
@@ -183,8 +192,20 @@ function ManualOnboarding({ isSupplier, onDone }) {
               <input value={form.businessType} onChange={set('businessType')} placeholder="Mill, exporter, trader…" className={`mt-1.5 ${inputCls}`} />
             </div>
             <div>
+              <label className="text-sm font-medium text-brand-800">Contact email</label>
+              <input type="email" value={form.contactEmail} onChange={set('contactEmail')} placeholder="sales@yourmill.com" className={`mt-1.5 ${inputCls}`} />
+            </div>
+            <div>
               <label className="text-sm font-medium text-brand-800">Contact phone</label>
               <input value={form.contactPhone} onChange={set('contactPhone')} placeholder="+91…" className={`mt-1.5 ${inputCls}`} />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-brand-800">Operating hours</label>
+              <select value={form.operatingHours} onChange={set('operatingHours')} className={`mt-1.5 ${inputCls}`}>
+                {[['weekdays_9_6', 'Weekdays 9 AM – 6 PM'], ['weekdays_10_8', 'Weekdays 10 AM – 8 PM'], ['mon_sat_9_7', 'Mon–Sat 9 AM – 7 PM'], ['all_week_10_8', 'All week 10 AM – 8 PM'], ['custom', 'Custom']].map(([v, l]) => (
+                  <option key={v} value={v}>{l}</option>
+                ))}
+              </select>
             </div>
             <div>
               <label className="text-sm font-medium text-brand-800">MOQ (units)</label>
@@ -226,8 +247,30 @@ function ManualOnboarding({ isSupplier, onDone }) {
         <div className={isSupplier ? 'sm:col-span-2' : ''}>
           <label className="text-sm font-medium text-brand-800">Categories of interest</label>
           <div className="mt-1.5 grid grid-cols-2 gap-2 sm:grid-cols-3">
-            {options(['cotton', 'silk', 'linen', 'wool', 'denim', 'polyester', 'viscose', 'blends', 'lace', 'embroidery', 'technical'])}
+            {interestsOptions(['cotton', 'silk', 'linen', 'wool', 'denim', 'polyester', 'viscose', 'blends', 'lace', 'embroidery', 'technical'])}
           </div>
+        </div>
+        <div className="sm:col-span-2">
+          <label className="text-sm font-medium text-brand-800">Fabric types</label>
+          <div className="mt-1.5 grid grid-cols-2 gap-2 sm:grid-cols-3">
+            {options('fabricTypes')(['woven', 'knit', 'poplin', 'chiffon', 'satin', 'georgette', 'jacquard', 'muslin', 'canvas', 'twill', 'velvet', 'crepe'])}
+          </div>
+        </div>
+        {!isSupplier && (
+          <div className="sm:col-span-2">
+            <label className="text-sm font-medium text-brand-800">Preferred colors</label>
+            <div className="mt-1.5 grid grid-cols-2 gap-2 sm:grid-cols-4">
+              {colorsOptions(['white', 'black', 'navy', 'blue', 'beige', 'olive', 'maroon', 'green', 'pink', 'gold', 'purple', 'red'])}
+            </div>
+          </div>
+        )}
+        <div className="sm:col-span-2">
+          <label className="text-sm font-medium text-brand-800">Prices shown in</label>
+          <select value={form.currency} onChange={set('currency')} className={`mt-1.5 ${inputCls}`}>
+            {CURRENCIES.map((c) => (
+              <option key={c.code} value={c.code}>{c.code} · {c.name}</option>
+            ))}
+          </select>
         </div>
       </div>
       <button

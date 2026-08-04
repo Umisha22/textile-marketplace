@@ -1,4 +1,5 @@
 import User from '../models/User.js';
+import { CURRENCY_WORDS } from './ai/lexicon.js';
 import {
   BUSINESS_TYPES,
   INDUSTRIES,
@@ -50,6 +51,26 @@ const LABELS = {
     all_week_10_8: 'All week 10 AM – 8 PM',
     custom: 'Custom hours',
   },
+  currency: {
+    USD: 'US Dollar (USD)',
+    INR: 'Indian Rupee (INR)',
+    EUR: 'Euro (EUR)',
+    GBP: 'British Pound (GBP)',
+    AED: 'UAE Dirham (AED)',
+    JPY: 'Japanese Yen (JPY)',
+    AUD: 'Australian Dollar (AUD)',
+    CAD: 'Canadian Dollar (CAD)',
+    CNY: 'Chinese Yuan (CNY)',
+    SGD: 'Singapore Dollar (SGD)',
+  },
+};
+
+const findCurrency = (text) => {
+  const t = text.toLowerCase();
+  for (const [code, words] of Object.entries(CURRENCY_WORDS)) {
+    if (words.some((w) => t.includes(w.toLowerCase()))) return code;
+  }
+  return 'USD';
 };
 
 const findEnum = (text, values) =>
@@ -140,6 +161,12 @@ const BUYER_STEPS = [
     emptyHint: 'Just say colors like "navy and white" or "pastels".',
   },
   {
+    key: 'currency',
+    question: 'Which currency would you like prices shown in? (dollars, rupees, euros, pounds, dirhams, yen...)',
+    parse: (text) => findCurrency(text),
+    emptyHint: 'Just say "rupees", "euros", "dollars", "pounds"…',
+  },
+  {
     key: 'notes',
     question:
       "Perfect, almost done! Any final preferences? For example minimum order flexibility, organic/sustainable materials, or sample requirements. (Type 'skip' to finish)",
@@ -206,6 +233,12 @@ const SUPPLIER_STEPS = [
     question: 'What is your minimum order quantity (MOQ)? (e.g. 100 meters)',
     parse: (text) => extractNumber(text) || 100,
     emptyHint: 'Type a number, e.g. "500 meters".',
+  },
+  {
+    key: 'currency',
+    question: 'Which currency would you like prices shown in? (dollars, rupees, euros, pounds, dirhams, yen...)',
+    parse: (text) => findCurrency(text),
+    emptyHint: 'Just say "rupees", "euros", "dollars", "pounds"…',
   },
   {
     key: 'description',

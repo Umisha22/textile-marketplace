@@ -3,6 +3,7 @@ import { api } from '../../api/client.js';
 import { Spinner } from '../../components/ui.jsx';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { useToast } from '../../context/ToastContext.jsx';
+import { CURRENCIES, setCurrency } from '../../utils/currency.js';
 
 export default function SupplierProfile() {
   const { user, refreshUser } = useAuth();
@@ -23,6 +24,7 @@ export default function SupplierProfile() {
     fabricTypes: [],
     moq: 100,
     description: '',
+    currency: 'USD',
   });
   const [saving, setSaving] = useState(false);
 
@@ -41,6 +43,7 @@ export default function SupplierProfile() {
       fabricTypes: p.fabricTypes || [],
       moq: p.moq || 100,
       description: p.description || '',
+      currency: p.currency || 'USD',
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -72,9 +75,11 @@ export default function SupplierProfile() {
           fabricTypes: form.fabricTypes,
           moq: Number(form.moq),
           description: form.description,
+          currency: form.currency,
         },
       });
       await refreshUser();
+      setCurrency(form.currency);
       toast('Profile updated');
     } catch (e) {
       toast(e.message, 'error');
@@ -147,6 +152,14 @@ export default function SupplierProfile() {
                   ['custom', 'Custom'],
                 ].map(([v, l]) => (
                   <option key={v} value={v}>{l}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-brand-800">Prices shown in</label>
+              <select value={form.currency} onChange={set('currency')} className={`mt-1.5 ${inputCls}`}>
+                {CURRENCIES.map((c) => (
+                  <option key={c.code} value={c.code}>{c.code} · {c.name}</option>
                 ))}
               </select>
             </div>

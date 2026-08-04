@@ -52,6 +52,7 @@ export const chat = asyncHandler(async (req, res) => {
     products: result.products || [],
     suggestions: result.suggestions || [],
     compare: result.compare || null,
+    estimate: result.estimate || null,
     onboardingStep: result.onboardingStep ?? null,
     onboardingComplete: result.onboardingComplete || false,
     progress: result.progress || null,

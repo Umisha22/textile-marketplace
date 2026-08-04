@@ -6,8 +6,10 @@ import { Spinner, EmptyState } from '../../components/ui.jsx';
 import { useToast } from '../../context/ToastContext.jsx';
 import { formatPrice } from '../../utils/format.js';
 import { CATEGORY_LABELS } from '../../utils/constants.js';
+import { useCurrency } from '../../hooks/useCurrency.js';
 
 export default function SupplierProducts() {
+  useCurrency();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();

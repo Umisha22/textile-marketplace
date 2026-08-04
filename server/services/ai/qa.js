@@ -1,9 +1,10 @@
 import Product from '../../models/Product.js';
 import { toProductBrief, findByName } from './engine.js';
+import { formatMoney } from '../../utils/currency.js';
 
 const formatColor = (c) => (c.name ? `${c.name}${c.hex ? ` (${c.hex})` : ''}` : '');
 
-export function answerAboutProduct(text, product) {
+export function answerAboutProduct(text, product, currency = 'USD') {
   const t = text.toLowerCase();
   const out = [];
   const supplier = product.supplier;
@@ -14,7 +15,7 @@ export function answerAboutProduct(text, product) {
     out.push(`The minimum order quantity (MOQ) for ${product.name} is ${product.moq || 100} ${product.unit}s.`);
   }
   if (/price|cost|how much|rate/.test(t)) {
-    out.push(`${product.name} is priced at $${product.price} per ${product.unit} (ex-works).`);
+    out.push(`${product.name} is priced at ${formatMoney(product.price, currency)} per ${product.unit} (ex-works).`);
   }
   if (/stock|available|availability|how many/.test(t)) {
     out.push(
@@ -74,7 +75,7 @@ export function answerAboutProduct(text, product) {
 
   if (!out.length) {
     out.push(
-      `Here's a quick snapshot of ${product.name}: $${product.price}/${product.unit}, ${product.fabricType || product.category}, ${product.colors?.length || 0} colorways, stock ${product.stock} ${product.unit}s, MOQ ${product.moq || 100}. What would you like to know?`
+      `Here's a quick snapshot of ${product.name}: ${formatMoney(product.price, currency)}/${product.unit}, ${product.fabricType || product.category}, ${product.colors?.length || 0} colorways, stock ${product.stock} ${product.unit}s, MOQ ${product.moq || 100}. What would you like to know?`
     );
   }
   return out.join(' ');

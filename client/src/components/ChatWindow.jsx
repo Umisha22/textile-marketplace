@@ -4,6 +4,7 @@ import ProductImage from './ProductImage.jsx';
 import VoiceButton from './VoiceButton.jsx';
 import { formatPrice } from '../utils/format.js';
 import { CATEGORY_LABELS } from '../utils/constants.js';
+import { useCurrency } from '../hooks/useCurrency.js';
 
 function ProductChips({ products }) {
   if (!products?.length) return null;
@@ -64,6 +65,58 @@ function CompareTable({ compare }) {
   );
 }
 
+function EstimateCard({ estimate }) {
+  if (!estimate) return null;
+  const meas = estimate.measurements || {};
+  return (
+    <div className="mt-3 overflow-hidden rounded-xl border border-brand-100 bg-white/90">
+      <div className="flex items-center justify-between gap-3 bg-brand-800 px-4 py-3">
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-brand-300">
+            Fabric estimate · {estimate.garmentName}
+          </p>
+          <p className="font-display text-2xl font-bold text-cream-100">
+            {estimate.meters} m
+            <span className="ml-2 text-xs font-medium text-brand-300">
+              (buy {estimate.suggestMeters} m to be safe)
+            </span>
+          </p>
+        </div>
+        <span className="rounded-lg bg-white/10 px-2.5 py-1 text-xs font-semibold text-cream-100">
+          {estimate.widthInch}&quot; wide
+        </span>
+      </div>
+      <div className="space-y-3 px-4 py-3">
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-brand-400">How I calculated it</p>
+          <ol className="mt-1 list-decimal space-y-0.5 pl-4 text-xs text-brand-700">
+            {estimate.steps.map((s, i) => (
+              <li key={i}>{s}</li>
+            ))}
+          </ol>
+        </div>
+        {(meas.height || meas.bust) && (
+          <div className="flex flex-wrap gap-1.5">
+            {meas.height ? <span className="rounded-full bg-brand-50 px-2 py-0.5 text-[11px] font-medium text-brand-700">Ht {meas.height} cm</span> : null}
+            {meas.bust ? <span className="rounded-full bg-brand-50 px-2 py-0.5 text-[11px] font-medium text-brand-700">Bust {meas.bust} cm</span> : null}
+            {meas.waist ? <span className="rounded-full bg-brand-50 px-2 py-0.5 text-[11px] font-medium text-brand-700">Waist {meas.waist} cm</span> : null}
+            {meas.hip ? <span className="rounded-full bg-brand-50 px-2 py-0.5 text-[11px] font-medium text-brand-700">Hip {meas.hip} cm</span> : null}
+            {meas.sleeve ? <span className="rounded-full bg-brand-50 px-2 py-0.5 text-[11px] font-medium text-brand-700">Sleeve {meas.sleeve} cm</span> : null}
+          </div>
+        )}
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-brand-400">Notes</p>
+          <ul className="mt-1 space-y-0.5 pl-4 text-xs text-brand-500">
+            {estimate.assumptions.map((a, i) => (
+              <li key={i} className="list-disc">{a}</li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function Bubble({ message }) {
   const isUser = message.from === 'user';
   return (
@@ -78,6 +131,7 @@ function Bubble({ message }) {
         <div className="whitespace-pre-wrap">{message.text}</div>
         {!isUser && <ProductChips products={message.products} />}
         {!isUser && message.compare && <CompareTable compare={message.compare} />}
+        {!isUser && message.estimate && <EstimateCard estimate={message.estimate} />}
       </div>
     </div>
   );
@@ -92,6 +146,7 @@ export default function ChatWindow({
   placeholder = 'Ask Weaver to find fabrics…',
   inputDisabled = false,
 }) {
+  useCurrency();
   const [input, setInput] = useState('');
   const bottomRef = useRef(null);
   const scrollRef = useRef(null);
