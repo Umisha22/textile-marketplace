@@ -3,6 +3,7 @@ import { useEffect, useRef } from 'react';
 const THREAD_COUNT = 18;
 const MOUSE_REPEL_RADIUS = 120;
 const MOUSE_REPEL_FORCE = 0.08;
+const PARALLAX_SPEED = 0.2;
 
 function createThread(w, h) {
   const isGold = Math.random() > 0.4;
@@ -24,6 +25,7 @@ export default function ParticleBackground() {
   const canvasRef = useRef(null);
   const threadsRef = useRef([]);
   const mouseRef = useRef({ x: -1000, y: -1000 });
+  const scrollRef = useRef(0);
   const rafRef = useRef();
 
   useEffect(() => {
@@ -50,13 +52,20 @@ export default function ParticleBackground() {
     };
     window.addEventListener('mousemove', onMouse);
 
+    const onScroll = () => {
+      scrollRef.current = window.scrollY;
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+
     const draw = () => {
       ctx.clearRect(0, 0, w, h);
       const mouse = mouseRef.current;
+      const scrollY = scrollRef.current;
+      const parallaxOffset = scrollY * PARALLAX_SPEED;
 
       for (const t of threadsRef.current) {
         const dx = t.x - mouse.x;
-        const dy = t.y - mouse.y;
+        const dy = t.y - mouse.y + parallaxOffset;
         const dist = Math.sqrt(dx * dx + dy * dy);
         if (dist < MOUSE_REPEL_RADIUS && dist > 0) {
           const force = (1 - dist / MOUSE_REPEL_RADIUS) * MOUSE_REPEL_FORCE;
@@ -75,11 +84,12 @@ export default function ParticleBackground() {
         if (t.y < -t.length) t.y = h + t.length;
         if (t.y > h + t.length) t.y = -t.length;
 
+        const drawY = t.y - parallaxOffset;
         const ex = t.x + Math.cos(t.angle) * t.length;
-        const ey = t.y + Math.sin(t.angle) * t.length;
+        const ey = drawY + Math.sin(t.angle) * t.length;
 
         ctx.beginPath();
-        ctx.moveTo(t.x, t.y);
+        ctx.moveTo(t.x, drawY);
         ctx.lineTo(ex, ey);
         ctx.strokeStyle = `rgba(${t.color}, ${t.alpha})`;
         ctx.lineWidth = t.width;
@@ -94,15 +104,19 @@ export default function ParticleBackground() {
     return () => {
       window.removeEventListener('resize', resize);
       window.removeEventListener('mousemove', onMouse);
+      window.removeEventListener('scroll', onScroll);
       cancelAnimationFrame(rafRef.current);
     };
   }, []);
 
   return (
-    <canvas
-      ref={canvasRef}
-      className="pointer-events-none fixed inset-0 z-0"
-      style={{ opacity: 0.6 }}
-    />
+    <>
+      <div className="mesh-gradient" />
+      <canvas
+        ref={canvasRef}
+        className="pointer-events-none fixed inset-0 z-0"
+        style={{ opacity: 0.6 }}
+      />
+    </>
   );
 }

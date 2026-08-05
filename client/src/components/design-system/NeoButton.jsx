@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 
 export default function NeoButton({
   children,
@@ -11,6 +11,7 @@ export default function NeoButton({
   ...props
 }) {
   const [pressed, setPressed] = useState(false);
+  const btnRef = useRef(null);
 
   const colorMap = {
     gold: 'bg-gold-500 text-void-950 hover:bg-gold-400 active:bg-gold-600',
@@ -31,10 +32,28 @@ export default function NeoButton({
     flat: pressed ? 'neo-pressed' : 'neo-flat',
   };
 
+  const spawnRipple = (e) => {
+    if (disabled) return;
+    const btn = btnRef.current;
+    if (!btn) return;
+    const rect = btn.getBoundingClientRect();
+    const size = Math.max(rect.width, rect.height) * 2;
+    const x = e.clientX - rect.left - size / 2;
+    const y = e.clientY - rect.top - size / 2;
+    const wave = document.createElement('span');
+    wave.className = 'ripple-wave';
+    wave.style.width = wave.style.height = `${size}px`;
+    wave.style.left = `${x}px`;
+    wave.style.top = `${y}px`;
+    btn.appendChild(wave);
+    setTimeout(() => wave.remove(), 600);
+  };
+
   return (
     <button
+      ref={btnRef}
       className={`
-        font-semibold transition-all duration-300 ease-out
+        font-semibold transition-all duration-300 ease-out btn-ripple
         ${colorMap[color] || colorMap.gold}
         ${sizeMap[size] || sizeMap.md}
         ${variant !== 'ghost' && variant !== 'ghost-teal' ? shadowMap[variant] || shadowMap.raised : ''}
@@ -43,7 +62,7 @@ export default function NeoButton({
         ${className}
       `}
       disabled={disabled}
-      onMouseDown={() => !disabled && setPressed(true)}
+      onMouseDown={(e) => { if (!disabled) { setPressed(true); spawnRipple(e); } }}
       onMouseUp={() => setPressed(false)}
       onMouseLeave={() => setPressed(false)}
       onClick={onClick}
