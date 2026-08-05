@@ -1,293 +1,274 @@
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { api } from '../api/client.js';
 import ProductCard from '../components/ProductCard.jsx';
-import FabricIcon from '../components/FabricIcon.jsx';
+import FabricSwatch, { LIGHTING_PRESETS } from '../components/design-system/FabricSwatch.jsx';
 import GlassPanel from '../components/design-system/GlassPanel.jsx';
 import NeoButton from '../components/design-system/NeoButton.jsx';
+import WaveformVisualizer from '../components/design-system/WaveformVisualizer.jsx';
+import FabricIcon from '../components/FabricIcon.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
-import { CATEGORY_LABELS, FABRIC_TYPE_LABELS } from '../utils/constants.js';
+import { api } from '../api/client.js';
+import { CATEGORY_LABELS } from '../utils/constants.js';
+import { useCurrency } from '../hooks/useCurrency.js';
 
-const CATEGORY_ICON = {
-  cotton: 'poplin', silk: 'silk', linen: 'woven', wool: 'broadcloth',
-  denim: 'denim', polyester: 'satin', viscose: 'crepe', blends: 'blends',
-  lace: 'lace', embroidery: 'jacquard', technical: 'twill',
-};
+const FABRIC_TYPES = ['cotton', 'silk', 'linen', 'wool', 'denim', 'velvet', 'chiffon', 'satin'];
 
 export default function Landing() {
+  useCurrency();
   const { user } = useAuth();
-  const [featured, setFeatured] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [recommended, setRecommended] = useState([]);
-  const [stats, setStats] = useState({ supplierCount: 0 });
-  const [search, setSearch] = useState('');
   const navigate = useNavigate();
+  const [search, setSearch] = useState('');
+  const [voiceActive, setVoiceActive] = useState(false);
+  const [fabricType, setFabricType] = useState('cotton');
+  const [lighting, setLighting] = useState('studio');
+  const [featured, setFeatured] = useState([]);
+  const [trending, setTrending] = useState([]);
 
   useEffect(() => {
-    api.get('/products/featured').then((d) => setFeatured(d.products)).catch(() => {});
-    api.get('/products/categories').then((d) => { setCategories(d.categories); setStats({ supplierCount: d.supplierCount || 0 }); }).catch(() => {});
+    api.get('/products?limit=4&sort=-createdAt').then((d) => setFeatured(d.products || [])).catch(() => {});
+    api.get('/products?limit=4&sort=-views').then((d) => setTrending(d.products || [])).catch(() => {});
   }, []);
 
-  useEffect(() => {
-    if (user?.role !== 'buyer') { setRecommended([]); return; }
-    api.get('/recommendations').then((d) => setRecommended(d.recommendedProducts || [])).catch(() => setRecommended([]));
-  }, [user]);
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (search.trim()) navigate(`/products?q=${encodeURIComponent(search.trim())}`);
+  };
 
-  const submitSearch = (e) => { e.preventDefault(); navigate(`/products?search=${encodeURIComponent(search)}`); };
+  const startVoice = () => {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) return;
+    const rec = new SR();
+    rec.lang = 'en-US';
+    rec.interimResults = false;
+    rec.onresult = (e) => {
+      const transcript = e.results?.[0]?.[0]?.transcript;
+      if (transcript) { setSearch(transcript); navigate(`/products?q=${encodeURIComponent(transcript)}`); }
+      setVoiceActive(false);
+    };
+    rec.onerror = () => setVoiceActive(false);
+    rec.onend = () => setVoiceActive(false);
+    setVoiceActive(true);
+    rec.start();
+  };
 
   return (
     <div>
-      {/* Hero */}
-      <section className="relative overflow-hidden">
-        <div className="pointer-events-none absolute -right-40 -top-40 h-[480px] w-[480px] rounded-full bg-gold-500/8 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-48 -left-32 h-[420px] w-[420px] rounded-full bg-teal-500/6 blur-3xl" />
-        <div className="relative mx-auto grid max-w-7xl gap-10 px-4 pb-16 pt-14 sm:px-6 lg:grid-cols-2 lg:items-center lg:pt-24">
-          <div className="animate-fade-up">
-            <p className="inline-flex items-center gap-2 rounded-full border border-gold-500/20 bg-void-700/50 px-3.5 py-1.5 text-xs font-medium text-gold-400">
-              <span className="h-1.5 w-1.5 rounded-full bg-teal-500" />
-              B2B Textile Marketplace · Powering apparel sourcing
-            </p>
-            <h1 className="mt-5 font-display text-4xl font-bold leading-[1.1] tracking-tight text-text-primary sm:text-5xl lg:text-6xl text-glow-gold">
-              Source quality fabrics, <span className="text-gold-400">directly from the mill.</span>
-            </h1>
-            <p className="mt-5 max-w-lg text-base leading-relaxed text-text-secondary sm:text-lg">
-              Browse verified fabric suppliers, compare materials, and place orders — all in one place.
-              Let AI find the perfect fabric for your next collection.
-            </p>
+      {/* ── HERO: Full-Viewport Immersive ── */}
+      <section className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-4">
+        <div className="absolute inset-0 bg-gradient-to-b from-void-950 via-void-900 to-void-950" />
+        <div className="absolute top-1/4 left-1/4 h-96 w-96 rounded-full bg-gold-500/5 blur-[120px]" />
+        <div className="absolute bottom-1/4 right-1/4 h-80 w-80 rounded-full bg-teal-500/5 blur-[100px]" />
 
-            <form onSubmit={submitSearch} className="mt-8 flex max-w-lg overflow-hidden neo-raised rounded-2xl p-1.5">
+        <div className="relative z-10 mx-auto max-w-7xl text-center">
+          <span className="inline-flex items-center gap-2 rounded-full bg-gold-500/10 px-4 py-1.5 text-xs font-semibold text-gold-400 border border-gold-500/20">
+            The Future of Fabric Sourcing
+          </span>
+
+          <h1 className="mt-6 font-display text-5xl font-bold leading-tight text-text-primary text-glow-gold sm:text-7xl lg:text-8xl">
+            Source Quality Fabrics,
+            <br />
+            <span className="text-gold-400">Directly from the Mill</span>
+          </h1>
+
+          <p className="mx-auto mt-6 max-w-2xl text-lg text-text-secondary">
+            AI-powered sourcing. Real-time inventory. Zero middlemen.
+          </p>
+
+          {/* 3D Fabric Swatch Viewer */}
+          <div className="mx-auto mt-10 max-w-2xl">
+            <GlassPanel className="overflow-hidden">
+              <div className="relative h-[340px] sm:h-[400px]">
+                <FabricSwatch
+                  fabricType={fabricType}
+                  lighting={lighting}
+                  className="h-full w-full"
+                />
+                {/* Lighting toggle pills */}
+                <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 gap-2">
+                  {Object.keys(LIGHTING_PRESETS).map((preset) => (
+                    <button
+                      key={preset}
+                      onClick={() => setLighting(preset)}
+                      className={`rounded-full px-3 py-1.5 text-[11px] font-semibold transition-all duration-300 ${
+                        lighting === preset
+                          ? 'bg-gold-500 text-void-950 shadow-lg'
+                          : 'glass text-text-secondary hover:text-gold-400'
+                      }`}
+                    >
+                      {preset.charAt(0).toUpperCase() + preset.slice(1)}
+                    </button>
+                  ))}
+                </div>
+                {/* Fabric type selector */}
+                <div className="absolute top-4 right-4 flex flex-col gap-1.5">
+                  {FABRIC_TYPES.slice(0, 5).map((ft) => (
+                    <button
+                      key={ft}
+                      onClick={() => setFabricType(ft)}
+                      className={`rounded-full px-2.5 py-1 text-[10px] font-semibold transition-all duration-300 ${
+                        fabricType === ft
+                          ? 'bg-teal-500 text-void-950'
+                          : 'glass text-text-muted hover:text-teal-400'
+                      }`}
+                    >
+                      {ft}
+                    </button>
+                  ))}
+                </div>
+                <div className="absolute top-4 left-4 text-[10px] text-text-muted font-mono">
+                  Drag to rotate · Scroll to zoom
+                </div>
+              </div>
+            </GlassPanel>
+          </div>
+
+          {/* Voice-Activated AI Search Bar */}
+          <form onSubmit={handleSearch} className="mx-auto mt-8 max-w-2xl">
+            <div className="neo-raised flex items-center gap-3 rounded-2xl px-5 py-3">
+              <button
+                type="button"
+                onClick={startVoice}
+                className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition-all duration-300 ${
+                  voiceActive
+                    ? 'bg-coral-500 text-white animate-glow-pulse'
+                    : 'bg-void-600 text-gold-400 hover:bg-void-500'
+                }`}
+              >
+                {voiceActive ? (
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="4" height="12" rx="1" /><rect x="14" y="6" width="4" height="12" rx="1" /></svg>
+                ) : (
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="9" y="2" width="6" height="12" rx="3" /><path d="M5 10v1a7 7 0 0 0 14 0v-1M12 18v4" /></svg>
+                )}
+              </button>
+              {voiceActive && (
+                <div className="h-8 w-32 shrink-0"><WaveformVisualizer active className="h-full" /></div>
+              )}
               <input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Try organic cotton under $5 or silk chiffon..."
-                className="flex-1 bg-transparent px-4 py-3 text-sm text-text-primary outline-none placeholder:text-text-muted"
+                placeholder="Describe what you're making... (e.g., 'Breathable linen under $6 for summer dresses')"
+                className="flex-1 bg-transparent text-sm text-text-primary placeholder:text-text-muted outline-none font-mono"
               />
-              <button type="submit" className="rounded-xl bg-gold-500 px-5 py-3 text-sm font-bold text-void-950 transition hover:bg-gold-400">
+              <NeoButton type="submit" size="sm" className="shrink-0">
                 Search
-              </button>
-            </form>
-
-            <div className="mt-6 flex flex-wrap gap-3">
-              <Link to="/products" className="neo-raised rounded-xl bg-gold-500/10 px-5 py-3 text-sm font-semibold text-gold-400 transition hover:bg-gold-500/20">
-                Browse Fabric Library
-              </Link>
-              <Link to="/assistant" className="neo-flat rounded-xl px-5 py-3 text-sm font-semibold text-text-secondary transition hover:text-text-primary">
-                🧶 Meet Weaver AI
-              </Link>
+              </NeoButton>
             </div>
-          </div>
+          </form>
 
-          <div className="relative hidden lg:block">
-            <div className="grid grid-cols-2 gap-4">
-              {featured.slice(0, 4).map((p, i) => (
-                <Link
-                  key={p._id}
-                  to={`/products/${p.slug}`}
-                  className={`group overflow-hidden rounded-2xl neo-raised transition-all duration-400 hover:-translate-y-1 hover:shadow-[var(--shadow-neo-hover)] ${i % 2 === 1 ? 'translate-y-6' : ''}`}
-                >
-                  <div className="flex h-40 items-center justify-center bg-gradient-to-br from-void-600 to-void-800 text-gold-400/60">
-                    <FabricIcon fabricType={p.fabricType || CATEGORY_ICON[p.category]} className="h-16 w-16" />
-                  </div>
-                  <div className="p-4">
-                    <p className="text-sm font-semibold text-text-primary">{p.name}</p>
-                    <p className="mt-1 font-mono text-xs text-gold-400">${p.price}/{p.unit}</p>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Stats strip */}
-      <section className="border-y border-void-600/50">
-        <div className="mx-auto grid max-w-7xl grid-cols-2 gap-6 px-4 py-8 text-center sm:px-6 lg:grid-cols-4">
-          {[
-            { v: `${stats.supplierCount || 20}+`, l: 'Verified suppliers' },
-            { v: '1,200+', l: 'Fabric listings' },
-            { v: '11', l: 'Fabric categories' },
-            { v: '24/7', l: 'AI sourcing assistant' },
-          ].map((s) => (
-            <div key={s.l}>
-              <p className="font-display text-3xl font-bold text-gold-400">{s.v}</p>
-              <p className="mt-1 text-sm text-text-secondary">{s.l}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Categories */}
-      <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6">
-        <div className="flex items-end justify-between">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-teal-500">Browse by category</p>
-            <h2 className="mt-2 font-display text-3xl font-bold text-text-primary">Shop fabric categories</h2>
-          </div>
-          <Link to="/products" className="hidden text-sm font-semibold text-gold-400 hover:text-gold-300 sm:block">
-            View all →
-          </Link>
-        </div>
-        <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
-          {categories.slice(0, 6).map((c) => (
-            <Link
-              key={c.name}
-              to={`/products?category=${c.name}`}
-              className="group neo-raised rounded-2xl p-5 text-center transition-all duration-400 hover:-translate-y-1 hover:shadow-[var(--shadow-neo-hover)]"
-            >
-              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-gold-500/10 text-gold-400 transition group-hover:bg-gold-500/20">
-                <FabricIcon fabricType={CATEGORY_ICON[c.name] || 'woven'} className="h-6 w-6" />
-              </div>
-              <p className="mt-3 font-display text-sm font-semibold text-text-primary">{CATEGORY_LABELS[c.name] || c.name}</p>
-              <p className="mt-0.5 text-xs text-text-muted">{c.count} products</p>
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      {/* Fabric types */}
-      <section className="border-y border-void-600/50">
-        <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6">
-          <div className="text-center">
-            <p className="text-xs font-semibold uppercase tracking-widest text-teal-500">By fabric type</p>
-            <h2 className="mt-2 font-display text-3xl font-bold text-text-primary">Shop by weave & construction</h2>
-          </div>
-          <div className="mt-8 flex flex-wrap justify-center gap-3">
-            {Object.entries(FABRIC_TYPE_LABELS).map(([type, label]) => (
+          {/* Quick fabric type pills */}
+          <div className="mx-auto mt-6 flex max-w-xl flex-wrap justify-center gap-2">
+            {['cotton', 'silk', 'linen', 'denim', 'wool', 'chiffon'].map((ft) => (
               <Link
-                key={type}
-                to={`/products?fabricType=${type}`}
-                className="group neo-flat flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold text-text-secondary transition-all duration-300 hover:text-gold-400 hover:shadow-[0_0_20px_rgba(212,168,83,0.08)]"
+                key={ft}
+                to={`/products?fabricType=${ft}`}
+                className="flex items-center gap-1.5 rounded-full border border-void-600/50 bg-void-700/50 px-3 py-1.5 text-xs font-medium text-text-secondary transition hover:border-gold-500/30 hover:text-gold-400"
               >
-                <FabricIcon fabricType={type} className="h-5 w-5 text-text-muted transition group-hover:text-gold-400" />
-                {label}
+                <FabricIcon fabricType={ft} className="h-3.5 w-3.5" />
+                {ft}
               </Link>
             ))}
           </div>
         </div>
-      </section>
 
-      {/* Featured products */}
-      <section className="py-14">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          <div className="flex items-end justify-between">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-widest text-teal-500">Curated for you</p>
-              <h2 className="mt-2 font-display text-3xl font-bold text-text-primary">Featured fabrics</h2>
-            </div>
-            <Link to="/products" className="text-sm font-semibold text-gold-400 hover:text-gold-300">View all →</Link>
-          </div>
-          <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {featured.map((p) => <ProductCard key={p._id} product={p} />)}
+        {/* Scroll indicator */}
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-float">
+          <div className="flex flex-col items-center gap-2 text-text-muted">
+            <span className="text-[10px] font-mono uppercase tracking-widest">Scroll to explore</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 5v14M5 12l7 7 7-7" /></svg>
           </div>
         </div>
       </section>
 
-      {/* Recommended */}
-      {user?.role === 'buyer' && recommended.length > 0 && (
-        <section className="border-y border-void-600/50 py-14">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6">
-            <div className="flex items-end justify-between">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-widest text-teal-500">Personalized</p>
-                <h2 className="mt-2 font-display text-3xl font-bold text-text-primary">Recommended for you</h2>
-              </div>
-              <Link to="/assistant" className="text-sm font-semibold text-gold-400 hover:text-gold-300">Ask Weaver AI →</Link>
+      {/* ── STATS STRIP ── */}
+      <section className="relative z-10 border-y border-void-600/30 bg-void-800/50 py-12">
+        <div className="mx-auto grid max-w-5xl grid-cols-2 gap-8 px-4 sm:grid-cols-4">
+          {[['5,000+', 'Fabrics Listed'], ['120+', 'Verified Mills'], ['98%', 'On-time Delivery'], ['24h', 'AI Response Time']].map(([v, l]) => (
+            <div key={l} className="text-center">
+              <p className="font-display text-3xl font-bold text-gold-400 text-glow-gold">{v}</p>
+              <p className="mt-1 text-xs text-text-muted">{l}</p>
             </div>
-            <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-              {recommended.slice(0, 4).map((p) => <ProductCard key={p.id || p._id} product={p} />)}
+          ))}
+        </div>
+      </section>
+
+      {/* ── FEATURED FABRICS ── */}
+      {featured.length > 0 && (
+        <section className="relative z-10 mx-auto max-w-7xl px-4 py-20 sm:px-6">
+          <div className="flex items-end justify-between">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-widest text-gold-400">New Arrivals</p>
+              <h2 className="mt-2 font-display text-3xl font-bold text-text-primary">Fresh from the mill</h2>
             </div>
+            <Link to="/products" className="text-sm font-semibold text-gold-400 hover:text-gold-300">View all →</Link>
+          </div>
+          <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {featured.map((p) => <ProductCard key={p._id} product={p} />)}
           </div>
         </section>
       )}
 
-      {/* AI promo */}
-      <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
-        <GlassPanel className="relative overflow-hidden p-8 sm:p-12">
-          <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-gold-500/10 blur-3xl" />
-          <div className="relative grid gap-8 lg:grid-cols-2 lg:items-center">
+      {/* ── AI PROMO ── */}
+      <section className="relative z-10 mx-auto max-w-5xl px-4 py-20 sm:px-6">
+        <GlassPanel className="p-8 sm:p-12">
+          <div className="grid gap-8 lg:grid-cols-[1fr_1fr]">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-widest text-gold-400">AI Marketplace Assistant</p>
-              <h2 className="mt-3 font-display text-3xl font-bold leading-tight text-text-primary sm:text-4xl">
-                "Show me breathable linen under $6 for summer dresses."
+              <span className="inline-flex items-center gap-2 rounded-full bg-gold-500/10 px-3 py-1 text-xs font-semibold text-gold-400 border border-gold-500/20">
+                AI-Powered
+              </span>
+              <h2 className="mt-4 font-display text-3xl font-bold text-text-primary text-glow-gold">
+                Meet Weaver
               </h2>
-              <p className="mt-4 max-w-lg text-sm leading-relaxed text-text-secondary">
-                Weaver understands plain language, recommends fabrics from real inventory, compares options side-by-side,
-                and answers product questions — even by voice.
+              <p className="mt-3 text-text-secondary">
+                Your AI sourcing assistant. Describe what you need in plain English — Weaver finds, compares, and recommends fabrics from thousands of verified mills.
               </p>
-              <div className="mt-6 flex flex-wrap gap-3">
-                <Link to="/assistant" className="neo-raised rounded-xl bg-gold-500 px-5 py-3 text-sm font-bold text-void-950 transition hover:bg-gold-400">
-                  Try the assistant
-                </Link>
-                <Link to="/products" className="neo-flat rounded-xl px-5 py-3 text-sm font-semibold text-text-secondary transition hover:text-text-primary">
-                  Browse manually
-                </Link>
-              </div>
+              <ul className="mt-6 space-y-2 text-sm text-text-secondary">
+                {['Natural language search', 'Photo-based color matching', 'Smart recommendations', 'Real-time MOQ & pricing'].map((f) => (
+                  <li key={f} className="flex items-center gap-2">
+                    <span className="h-1.5 w-1.5 rounded-full bg-teal-500" />{f}
+                  </li>
+                ))}
+              </ul>
+              <Link to="/assistant">
+                <NeoButton className="mt-8">Try Weaver AI</NeoButton>
+              </Link>
             </div>
-            <div className="space-y-3">
-              {[
-                { q: 'What is the MOQ for the Banarasi silk?', a: 'MOQ is 100 meters for Banarasi Silk Jacquard.' },
-                { q: 'Compare silk chiffon vs satin', a: 'Here is a side-by-side comparison…' },
-                { q: 'Recommend fabrics for bridal wear', a: 'Banarasi Silk Jacquard, Embroidered Net, Chantilly Lace…' },
-              ].map((ex) => (
-                <div key={ex.q} className="glass rounded-2xl p-4">
-                  <p className="text-xs font-semibold text-gold-400">You: {ex.q}</p>
-                  <p className="mt-1.5 text-sm text-text-secondary">Weaver: {ex.a}</p>
+            <div className="flex items-center justify-center">
+              <div className="relative h-64 w-64">
+                <div className="absolute inset-0 rounded-full bg-gold-500/10 animate-breathe" />
+                <div className="absolute inset-4 rounded-full bg-gold-500/5 animate-glow-pulse flex items-center justify-center">
+                  <span className="font-display text-5xl text-gold-400 text-glow-gold">W</span>
                 </div>
-              ))}
+                {[0, 1, 2].map((i) => (
+                  <div
+                    key={i}
+                    className="absolute inset-0 rounded-full border border-gold-500/10"
+                    style={{
+                      animation: `spin ${6 + i * 2}s linear infinite`,
+                      transform: `rotate(${i * 60}deg)`,
+                    }}
+                  />
+                ))}
+              </div>
             </div>
           </div>
         </GlassPanel>
       </section>
 
-      {/* How it works */}
-      <section className="mx-auto max-w-7xl px-4 pb-16 sm:px-6">
-        <div className="text-center">
-          <p className="text-xs font-semibold uppercase tracking-widest text-teal-500">Simple workflow</p>
-          <h2 className="mt-2 font-display text-3xl font-bold text-text-primary">How the marketplace works</h2>
-        </div>
-        <div className="mt-10 grid gap-6 md:grid-cols-3">
-          {[
-            { n: '01', t: 'Discover', d: 'Search or ask Weaver AI to find fabrics that match your spec, budget and use case.' },
-            { n: '02', t: 'Order', d: 'Add to cart, review your order, and place it directly with the supplying mill.' },
-            { n: '03', t: 'Track', d: 'Follow order status from pending → accepted → preparing → ready for dispatch → completed.' },
-          ].map((s) => (
-            <div key={s.n} className="neo-raised rounded-2xl p-6">
-              <p className="font-display text-4xl font-bold text-gold-500/30">{s.n}</p>
-              <h3 className="mt-3 font-display text-xl font-semibold text-text-primary">{s.t}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-text-secondary">{s.d}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Supplier CTA */}
-      <section className="border-t border-void-600/50">
-        <div className="mx-auto grid max-w-7xl gap-8 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:items-center">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-teal-500">For suppliers</p>
-            <h2 className="mt-2 font-display text-3xl font-bold text-text-primary">
-              Put your mill in front of thousands of buyers.
-            </h2>
-            <p className="mt-4 max-w-lg text-sm leading-relaxed text-text-secondary">
-              List your inventory in minutes, manage stock, and fulfil incoming orders from a single supplier console.
-            </p>
-            <Link to="/login?mode=register" className="mt-6 inline-block neo-raised rounded-xl bg-gold-500 px-6 py-3 text-sm font-bold text-void-950 transition hover:bg-gold-400">
-              Become a supplier
+      {/* ── CATEGORY GRID ── */}
+      <section className="relative z-10 mx-auto max-w-7xl px-4 py-20 sm:px-6">
+        <p className="text-xs font-semibold uppercase tracking-widest text-gold-400 text-center">Browse by Category</p>
+        <h2 className="mt-2 font-display text-3xl font-bold text-text-primary text-center">Find your fabric</h2>
+        <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+          {Object.entries(CATEGORY_LABELS).slice(0, 8).map(([key, label]) => (
+            <Link
+              key={key}
+              to={`/products?category=${key}`}
+              className="neo-raised group flex flex-col items-center gap-3 rounded-2xl p-6 transition-all duration-400 hover:-translate-y-1 thread-border"
+            >
+              <FabricIcon fabricType={key} className="h-10 w-10 text-text-muted group-hover:text-gold-400 transition-colors" />
+              <span className="text-sm font-semibold text-text-secondary group-hover:text-text-primary transition-colors">{label}</span>
             </Link>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            {[
-              { v: '2 min', l: 'to list a product' },
-              { v: '1 console', l: 'for inventory + orders' },
-              { v: '5', l: 'order status stages' },
-              { v: 'AI', l: 'inventory alerting' },
-            ].map((s) => (
-              <div key={s.l} className="neo-flat rounded-2xl p-5 text-center">
-                <p className="font-display text-2xl font-bold text-gold-400">{s.v}</p>
-                <p className="mt-1 text-xs text-text-secondary">{s.l}</p>
-              </div>
-            ))}
-          </div>
+          ))}
         </div>
       </section>
     </div>

@@ -6,3 +6,5 @@ export { default as NeoInput } from './NeoInput.jsx';
 export { default as ThreadLoader } from './ThreadLoader.jsx';
 export { default as GlowOrb } from './GlowOrb.jsx';
 export { default as NeoToggle } from './NeoToggle.jsx';
+export { default as FabricSwatch, LIGHTING_PRESETS, FABRIC_COLORS } from './FabricSwatch.jsx';
+export { default as WaveformVisualizer } from './WaveformVisualizer.jsx';

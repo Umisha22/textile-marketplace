@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useCart } from '../context/CartContext.jsx';
 import Brand from './Brand.jsx';
 import CurrencySwitcher from './CurrencySwitcher.jsx';
+import CartSlidePanel from './CartSlidePanel.jsx';
 
 const navLink = ({ isActive }) =>
   `relative rounded-xl px-4 py-2 text-sm font-medium transition-all duration-300 ${
@@ -14,11 +15,37 @@ const navLink = ({ isActive }) =>
 
 const navLinkActive = `after:absolute after:bottom-0 after:left-1/2 after:h-[2px] after:w-0 after:-translate-x-1/2 after:rounded-full after:bg-gold-500 after:transition-all after:duration-300 hover:after:w-4/5`;
 
+function CartBadge({ count }) {
+  const prevCount = useRef(count);
+  const [anim, setAnim] = useState(false);
+
+  useEffect(() => {
+    if (count > prevCount.current) {
+      setAnim(true);
+      setTimeout(() => setAnim(false), 500);
+    }
+    prevCount.current = count;
+  }, [count]);
+
+  if (count <= 0) return null;
+  return (
+    <span
+      className={`absolute -right-1.5 -top-1.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-gold-500 px-1 text-[10px] font-bold text-void-950 transition-transform duration-300 ${
+        anim ? 'scale-125' : 'scale-100'
+      }`}
+      style={anim ? { animation: 'cartBounce 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)' } : {}}
+    >
+      {count}
+    </span>
+  );
+}
+
 export default function Navbar() {
   const { user, logout } = useAuth();
   const { count } = useCart();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+  const [cartOpen, setCartOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
@@ -29,133 +56,135 @@ export default function Navbar() {
   const isSupplier = user?.role === 'supplier';
 
   return (
-    <header className="sticky top-0 z-40 mx-auto w-full max-w-7xl px-4 pt-3 sm:px-6">
-      <nav className="glass-strong flex h-14 items-center justify-between gap-4 rounded-2xl px-4 sm:px-6">
-        <Link to={isSupplier ? '/supplier' : '/'} className="flex items-center gap-2.5">
-          <Brand />
-        </Link>
+    <>
+      <style>{`@keyframes cartBounce { 0% { transform: scale(1); } 40% { transform: scale(1.4); } 70% { transform: scale(0.9); } 100% { transform: scale(1.25); } }`}</style>
+      <header className="sticky top-0 z-40 mx-auto w-full max-w-7xl px-4 pt-3 sm:px-6">
+        <nav className="glass-strong flex h-14 items-center justify-between gap-4 rounded-2xl px-4 sm:px-6">
+          <Link to={isSupplier ? '/supplier' : '/'} className="flex items-center gap-2.5">
+            <Brand />
+          </Link>
 
-        <nav className="hidden items-center gap-1 md:flex">
-          {!isSupplier ? (
-            <>
-              <NavLink to="/" className={(d) => `${navLink(d)} ${navLinkActive}`} end>Home</NavLink>
-              <NavLink to="/products" className={(d) => `${navLink(d)} ${navLinkActive}`}>Fabric Library</NavLink>
-              <NavLink to="/assistant" className={(d) => `${navLink(d)} ${navLinkActive}`}>AI Assistant</NavLink>
-            </>
-          ) : (
-            <>
-              <NavLink to="/supplier" className={(d) => `${navLink(d)} ${navLinkActive}`} end>Dashboard</NavLink>
-              <NavLink to="/supplier/products" className={(d) => `${navLink(d)} ${navLinkActive}`}>Inventory</NavLink>
-              <NavLink to="/supplier/orders" className={(d) => `${navLink(d)} ${navLinkActive}`}>Orders</NavLink>
-              <NavLink to="/supplier/profile" className={(d) => `${navLink(d)} ${navLinkActive}`}>Profile</NavLink>
-            </>
-          )}
-        </nav>
-
-        <div className="flex items-center gap-2">
-          <CurrencySwitcher />
-          {!isSupplier && (
-            <Link
-              to="/cart"
-              className="neo-flat relative flex h-10 w-10 items-center justify-center rounded-xl text-text-secondary transition-all duration-300 hover:text-gold-400 hover:shadow-[0_0_20px_rgba(212,168,83,0.1)]"
-              title="Cart"
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="9" cy="21" r="1.4" />
-                <circle cx="19" cy="21" r="1.4" />
-                <path d="M2.5 3h2l2.6 12.5a2 2 0 0 0 2 1.5h8.8a2 2 0 0 0 2-1.6L21.5 8H6.1" />
-              </svg>
-              {count > 0 && (
-                <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-gold-500 px-1 text-[10px] font-bold text-void-950">
-                  {count}
-                </span>
-              )}
-            </Link>
-          )}
-
-          {user ? (
-            <div className="flex items-center gap-2">
-              <Link
-                to={isSupplier ? '/supplier' : '/account'}
-                className="neo-flat hidden items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-text-primary transition-all duration-300 hover:text-gold-400 sm:flex"
-              >
-                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-gold-500/20 text-xs font-bold text-gold-400">
-                  {user.name?.[0]?.toUpperCase()}
-                </span>
-                {user.name?.split(' ')[0]}
-              </Link>
-              <button
-                type="button"
-                onClick={handleLogout}
-                className="rounded-xl px-3 py-2 text-sm font-medium text-text-secondary transition hover:text-coral-400"
-              >
-                Logout
-              </button>
-            </div>
-          ) : (
-            <div className="hidden items-center gap-2 sm:flex">
-              <Link
-                to="/login"
-                className="rounded-xl px-4 py-2 text-sm font-medium text-text-secondary transition hover:text-text-primary"
-              >
-                Log in
-              </Link>
-              <Link
-                to="/login?mode=register"
-                className="neo-raised rounded-xl bg-gold-500 px-4 py-2 text-sm font-bold text-void-950 transition-all duration-300 hover:bg-gold-400"
-              >
-                Join now
-              </Link>
-            </div>
-          )}
-
-          <button
-            type="button"
-            onClick={() => setOpen(!open)}
-            className="neo-flat flex h-10 w-10 items-center justify-center rounded-xl text-text-secondary md:hidden"
-            aria-label="Menu"
-          >
-            {open ? (
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M6 6l12 12M18 6L6 18" /></svg>
-            ) : (
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
-            )}
-          </button>
-        </div>
-      </nav>
-
-      {open && (
-        <nav className="glass-strong mt-2 rounded-2xl px-4 py-3 md:hidden">
-          <div className="flex flex-col gap-1">
+          <nav className="hidden items-center gap-1 md:flex">
             {!isSupplier ? (
               <>
-                <Link to="/" onClick={() => setOpen(false)} className="rounded-xl px-3 py-2.5 text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-void-600/50">Home</Link>
-                <Link to="/products" onClick={() => setOpen(false)} className="rounded-xl px-3 py-2.5 text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-void-600/50">Fabric Library</Link>
-                <Link to="/assistant" onClick={() => setOpen(false)} className="rounded-xl px-3 py-2.5 text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-void-600/50">AI Assistant</Link>
-                <Link to="/cart" onClick={() => setOpen(false)} className="rounded-xl px-3 py-2.5 text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-void-600/50">Cart ({count})</Link>
+                <NavLink to="/" className={(d) => `${navLink(d)} ${navLinkActive}`} end>Home</NavLink>
+                <NavLink to="/products" className={(d) => `${navLink(d)} ${navLinkActive}`}>Fabric Library</NavLink>
+                <NavLink to="/assistant" className={(d) => `${navLink(d)} ${navLinkActive}`}>AI Assistant</NavLink>
               </>
             ) : (
               <>
-                <Link to="/supplier" onClick={() => setOpen(false)} className="rounded-xl px-3 py-2.5 text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-void-600/50">Dashboard</Link>
-                <Link to="/supplier/products" onClick={() => setOpen(false)} className="rounded-xl px-3 py-2.5 text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-void-600/50">Inventory</Link>
-                <Link to="/supplier/orders" onClick={() => setOpen(false)} className="rounded-xl px-3 py-2.5 text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-void-600/50">Orders</Link>
-                <Link to="/supplier/profile" onClick={() => setOpen(false)} className="rounded-xl px-3 py-2.5 text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-void-600/50">Profile</Link>
+                <NavLink to="/supplier" className={(d) => `${navLink(d)} ${navLinkActive}`} end>Dashboard</NavLink>
+                <NavLink to="/supplier/products" className={(d) => `${navLink(d)} ${navLinkActive}`}>Inventory</NavLink>
+                <NavLink to="/supplier/orders" className={(d) => `${navLink(d)} ${navLinkActive}`}>Orders</NavLink>
+                <NavLink to="/supplier/profile" className={(d) => `${navLink(d)} ${navLinkActive}`}>Profile</NavLink>
               </>
             )}
-            {!user && (
-              <div className="mt-2 flex gap-2 border-t border-void-600 pt-3">
-                <Link to="/login" onClick={() => setOpen(false)} className="flex-1 rounded-xl border border-gold-500/20 px-3 py-2.5 text-center text-sm font-semibold text-gold-400">Log in</Link>
-                <Link to="/login?mode=register" onClick={() => setOpen(false)} className="flex-1 rounded-xl bg-gold-500 px-3 py-2.5 text-center text-sm font-bold text-void-950">Join now</Link>
-              </div>
-            )}
-            {user && (
-              <button type="button" onClick={handleLogout} className="mt-2 rounded-xl px-3 py-2.5 text-left text-sm font-semibold text-coral-400">
-                Logout
+          </nav>
+
+          <div className="flex items-center gap-2">
+            <CurrencySwitcher />
+            {!isSupplier && (
+              <button
+                onClick={() => setCartOpen(true)}
+                className="neo-flat relative flex h-10 w-10 items-center justify-center rounded-xl text-text-secondary transition-all duration-300 hover:text-gold-400 hover:shadow-[0_0_20px_rgba(212,168,83,0.1)]"
+                title="Cart"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="9" cy="21" r="1.4" />
+                  <circle cx="19" cy="21" r="1.4" />
+                  <path d="M2.5 3h2l2.6 12.5a2 2 0 0 0 2 1.5h8.8a2 2 0 0 0 2-1.6L21.5 8H6.1" />
+                </svg>
+                <CartBadge count={count} />
               </button>
             )}
+
+            {user ? (
+              <div className="flex items-center gap-2">
+                <Link
+                  to={isSupplier ? '/supplier' : '/account'}
+                  className="neo-flat hidden items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-text-primary transition-all duration-300 hover:text-gold-400 sm:flex"
+                >
+                  <span className="relative flex h-7 w-7 items-center justify-center rounded-full bg-gold-500/20 text-xs font-bold text-gold-400">
+                    {user.name?.[0]?.toUpperCase()}
+                    <span className="absolute bottom-0 right-0 h-2 w-2 rounded-full bg-teal-500 border border-void-800" />
+                  </span>
+                  {user.name?.split(' ')[0]}
+                </Link>
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="rounded-xl px-3 py-2 text-sm font-medium text-text-secondary transition hover:text-coral-400"
+                >
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <div className="hidden items-center gap-2 sm:flex">
+                <Link
+                  to="/login"
+                  className="rounded-xl px-4 py-2 text-sm font-medium text-text-secondary transition hover:text-text-primary"
+                >
+                  Log in
+                </Link>
+                <Link
+                  to="/login?mode=register"
+                  className="neo-raised rounded-xl bg-gold-500 px-4 py-2 text-sm font-bold text-void-950 transition-all duration-300 hover:bg-gold-400"
+                >
+                  Join now
+                </Link>
+              </div>
+            )}
+
+            <button
+              type="button"
+              onClick={() => setOpen(!open)}
+              className="neo-flat flex h-10 w-10 items-center justify-center rounded-xl text-text-secondary md:hidden"
+              aria-label="Menu"
+            >
+              {open ? (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M6 6l12 12M18 6L6 18" /></svg>
+              ) : (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
+              )}
+            </button>
           </div>
         </nav>
-      )}
-    </header>
+
+        {open && (
+          <nav className="glass-strong mt-2 rounded-2xl px-4 py-3 md:hidden">
+            <div className="flex flex-col gap-1">
+              {!isSupplier ? (
+                <>
+                  <Link to="/" onClick={() => setOpen(false)} className="rounded-xl px-3 py-2.5 text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-void-600/50">Home</Link>
+                  <Link to="/products" onClick={() => setOpen(false)} className="rounded-xl px-3 py-2.5 text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-void-600/50">Fabric Library</Link>
+                  <Link to="/assistant" onClick={() => setOpen(false)} className="rounded-xl px-3 py-2.5 text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-void-600/50">AI Assistant</Link>
+                  <button onClick={() => { setOpen(false); setCartOpen(true); }} className="rounded-xl px-3 py-2.5 text-left text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-void-600/50">Cart ({count})</button>
+                </>
+              ) : (
+                <>
+                  <Link to="/supplier" onClick={() => setOpen(false)} className="rounded-xl px-3 py-2.5 text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-void-600/50">Dashboard</Link>
+                  <Link to="/supplier/products" onClick={() => setOpen(false)} className="rounded-xl px-3 py-2.5 text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-void-600/50">Inventory</Link>
+                  <Link to="/supplier/orders" onClick={() => setOpen(false)} className="rounded-xl px-3 py-2.5 text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-void-600/50">Orders</Link>
+                  <Link to="/supplier/profile" onClick={() => setOpen(false)} className="rounded-xl px-3 py-2.5 text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-void-600/50">Profile</Link>
+                </>
+              )}
+              {!user && (
+                <div className="mt-2 flex gap-2 border-t border-void-600 pt-3">
+                  <Link to="/login" onClick={() => setOpen(false)} className="flex-1 rounded-xl border border-gold-500/20 px-3 py-2.5 text-center text-sm font-semibold text-gold-400">Log in</Link>
+                  <Link to="/login?mode=register" onClick={() => setOpen(false)} className="flex-1 rounded-xl bg-gold-500 px-3 py-2.5 text-center text-sm font-bold text-void-950">Join now</Link>
+                </div>
+              )}
+              {user && (
+                <button type="button" onClick={handleLogout} className="mt-2 rounded-xl px-3 py-2.5 text-left text-sm font-semibold text-coral-400">
+                  Logout
+                </button>
+              )}
+            </div>
+          </nav>
+        )}
+      </header>
+
+      <CartSlidePanel open={cartOpen} onClose={() => setCartOpen(false)} />
+    </>
   );
 }
