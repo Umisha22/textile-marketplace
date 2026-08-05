@@ -313,7 +313,7 @@ export default function ProductImage({ product, src, alt, className = '', rounde
 
   return (
     <div
-      className={`${rounded ? 'rounded-xl' : ''} flex h-full w-full items-center justify-center overflow-hidden bg-brand-100 ${className}`}
+      className={`${rounded ? 'rounded-xl' : ''} flex h-full w-full items-center justify-center overflow-hidden bg-void-700 ${className}`}
     >
       <img src={dataUri} alt={alt || product?.name || 'Product'} className="h-full w-full object-cover" />
     </div>

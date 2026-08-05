@@ -19,12 +19,12 @@ export function Spinner({ className = 'h-6 w-6' }) {
 
 export function EmptyState({ title, description, action }) {
   return (
-    <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-brand-200 bg-white/60 px-6 py-16 text-center">
-      <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-brand-100 text-2xl">
-        🧵
+    <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-void-600 bg-void-800/50 px-6 py-16 text-center">
+      <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-void-700 text-2xl text-text-muted">
+        Fabric
       </div>
-      <h3 className="font-display text-xl font-semibold text-brand-900">{title}</h3>
-      {description && <p className="mt-1 max-w-sm text-sm text-brand-600">{description}</p>}
+      <h3 className="font-display text-xl font-semibold text-text-primary">{title}</h3>
+      {description && <p className="mt-1 max-w-sm text-sm text-text-secondary">{description}</p>}
       {action && <div className="mt-5">{action}</div>}
     </div>
   );
@@ -35,7 +35,7 @@ export function StatusBadge({ status }) {
     pending: 'bg-amber-100 text-amber-800 ring-amber-200',
     accepted: 'bg-sky-100 text-sky-800 ring-sky-200',
     preparing: 'bg-violet-100 text-violet-800 ring-violet-200',
-    ready_for_dispatch: 'bg-brand-100 text-brand-800 ring-brand-200',
+    ready_for_dispatch: 'bg-amber-100 text-amber-800 ring-amber-200',
     completed: 'bg-emerald-100 text-emerald-800 ring-emerald-200',
   };
   const label = {

@@ -26,8 +26,8 @@ export function ToastProvider({ children }) {
         {toasts.map((t) => (
           <div
             key={t.id}
-            className={`animate-pop flex items-start gap-3 rounded-xl px-4 py-3 text-sm font-medium text-white shadow-lift ${
-              t.type === 'error' ? 'bg-clay-600' : 'bg-brand-800'
+            className={`animate-pop flex items-start gap-3 rounded-xl px-4 py-3 text-sm font-medium text-white shadow-lg ${
+              t.type === 'error' ? 'bg-coral-500' : 'bg-gold-500'
             }`}
           >
             <span className="mt-0.5">{t.type === 'error' ? '✕' : '✓'}</span>
