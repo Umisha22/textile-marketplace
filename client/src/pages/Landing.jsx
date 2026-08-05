@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../api/client.js';
 import ProductCard from '../components/ProductCard.jsx';
@@ -22,6 +22,17 @@ export default function Landing() {
   const [stats, setStats] = useState({ supplierCount: 0 });
   const [search, setSearch] = useState('');
   const navigate = useNavigate();
+  const heroRef = useRef(null);
+
+  useEffect(() => {
+    const onScroll = () => {
+      if (!heroRef.current) return;
+      const y = window.scrollY;
+      heroRef.current.style.transform = `translateY(${y * 0.15}px)`;
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   useEffect(() => {
     api.get('/products/featured').then((d) => setFeatured(d.products)).catch(() => {});
@@ -39,8 +50,10 @@ export default function Landing() {
     <div>
       {/* Hero */}
       <section className="relative overflow-hidden">
-        <div className="pointer-events-none absolute -right-40 -top-40 h-[480px] w-[480px] rounded-full bg-gold-500/8 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-48 -left-32 h-[420px] w-[420px] rounded-full bg-teal-500/6 blur-3xl" />
+        <div ref={heroRef} className="parallax-layer">
+          <div className="pointer-events-none absolute -right-40 -top-40 h-[480px] w-[480px] rounded-full bg-gold-500/8 blur-3xl" />
+          <div className="pointer-events-none absolute -bottom-48 -left-32 h-[420px] w-[420px] rounded-full bg-teal-500/6 blur-3xl" />
+        </div>
         <div className="relative mx-auto grid max-w-7xl gap-10 px-4 pb-16 pt-14 sm:px-6 lg:grid-cols-2 lg:items-center lg:pt-24">
           <div className="animate-fade-up">
             <p className="inline-flex items-center gap-2 rounded-full border border-gold-500/20 bg-void-700/50 px-3.5 py-1.5 text-xs font-medium text-gold-400">

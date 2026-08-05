@@ -6,7 +6,16 @@ export default function ThreadLoader({ className = '', text = 'Loading…' }) {
           <div className="h-full w-full rounded-full bg-gradient-to-r from-gold-500 via-teal-500 to-gold-500" />
         </div>
       </div>
-      {text && <p className="text-xs text-text-secondary font-mono">{text}</p>}
+      {text && (
+        <div className="flex items-center gap-2">
+          <div className="flex gap-1">
+            <span className="inline-block h-1.5 w-1.5 rounded-full bg-gold-500 animate-[breathe_1.2s_ease-in-out_0s_infinite]" />
+            <span className="inline-block h-1.5 w-1.5 rounded-full bg-gold-500 animate-[breathe_1.2s_ease-in-out_0.2s_infinite]" />
+            <span className="inline-block h-1.5 w-1.5 rounded-full bg-gold-500 animate-[breathe_1.2s_ease-in-out_0.4s_infinite]" />
+          </div>
+          <p className="text-xs text-text-secondary font-mono">{text}</p>
+        </div>
+      )}
     </div>
   );
 }

@@ -338,3 +338,148 @@ body {
   background: rgba(212, 168, 83, 0.3);
   color: var(--color-text-primary);
 }
+
+/* ── Page Transition: Thread Weave In ── */
+@keyframes threadStitchAcross {
+  0% { transform: scaleX(0); opacity: 0; }
+  10% { opacity: 1; }
+  50% { transform: scaleX(1); opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: scaleX(0); opacity: 0; }
+}
+@keyframes contentWeaveIn {
+  0% { opacity: 0; transform: translateY(24px) scale(0.98); filter: blur(8px); }
+  60% { filter: blur(0); }
+  100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+.page-transition-enter {
+  animation: contentWeaveIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.thread-stitch-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+}
+.thread-stitch-overlay::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--color-gold-500), var(--color-teal-500), var(--color-gold-500), transparent);
+  transform-origin: center;
+  animation: threadStitchAcross 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+  box-shadow: 0 0 20px rgba(212, 168, 83, 0.4), 0 0 40px rgba(212, 168, 83, 0.2);
+}
+
+/* ── Custom Cursor ── */
+.custom-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--color-gold-500);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 99999;
+  transition: width 0.25s cubic-bezier(0.22, 1, 0.36, 1), height 0.25s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.25s, background 0.25s, transform 0.08s ease-out;
+  transform: translate(-50%, -50%);
+  mix-blend-mode: difference;
+}
+.custom-cursor.hovering {
+  width: 44px;
+  height: 44px;
+  border-color: var(--color-gold-400);
+  background: rgba(212, 168, 83, 0.08);
+}
+.custom-cursor.fabric-hover {
+  width: 56px;
+  height: 56px;
+  border-color: var(--color-teal-500);
+  background: rgba(0, 212, 170, 0.06);
+  border-style: dashed;
+}
+.custom-cursor.fabric-hover::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: -6px;
+  right: -6px;
+  height: 1px;
+  background: var(--color-teal-500);
+  opacity: 0.5;
+}
+.custom-cursor.fabric-hover::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: -6px;
+  bottom: -6px;
+  width: 1px;
+  background: var(--color-teal-500);
+  opacity: 0.5;
+}
+@media (pointer: coarse) {
+  .custom-cursor { display: none !important; }
+}
+
+/* ── Toast Slide-In ── */
+@keyframes toastSlideIn {
+  0% { opacity: 0; transform: translateX(100%) scale(0.95); filter: blur(4px); }
+  100% { opacity: 1; transform: translateX(0) scale(1); filter: blur(0); }
+}
+@keyframes toastSlideOut {
+  0% { opacity: 1; transform: translateX(0) scale(1); }
+  100% { opacity: 0; transform: translateX(100%) scale(0.95); }
+}
+.toast-enter {
+  animation: toastSlideIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.toast-exit {
+  animation: toastSlideOut 0.3s ease-in both;
+}
+
+/* ── Empty State Orb ── */
+@keyframes orbDormant {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 20px rgba(212, 168, 83, 0.15), 0 0 60px rgba(212, 168, 83, 0.05); }
+  50% { transform: scale(1.08); box-shadow: 0 0 30px rgba(212, 168, 83, 0.25), 0 0 80px rgba(212, 168, 83, 0.1); }
+}
+.empty-orb {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, var(--color-gold-500), var(--color-gold-700));
+  animation: orbDormant 4s ease-in-out infinite;
+  position: relative;
+}
+.empty-orb::before {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  border: 1px dashed rgba(212, 168, 83, 0.2);
+  animation: spin 12s linear infinite;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Scroll Progress Bar ── */
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--color-gold-500), var(--color-teal-500));
+  z-index: 99998;
+  transition: width 0.1s linear;
+}
+
+/* ── Parallax Helper ── */
+.parallax-layer {
+  will-change: transform;
+  transition: transform 0.1s linear;
+}

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useCart } from '../context/CartContext.jsx';
@@ -19,6 +19,24 @@ export default function Navbar() {
   const { count } = useCart();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+  const [scrollBlur, setScrollBlur] = useState(20);
+  const lastScroll = useRef(0);
+  const lastTime = useRef(Date.now());
+
+  useEffect(() => {
+    const onScroll = () => {
+      const now = Date.now();
+      const dt = Math.max(now - lastTime.current, 1);
+      const dy = Math.abs(window.scrollY - lastScroll.current);
+      const speed = dy / dt;
+      const blur = Math.min(40, 20 + speed * 15);
+      setScrollBlur(blur);
+      lastScroll.current = window.scrollY;
+      lastTime.current = now;
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -30,7 +48,10 @@ export default function Navbar() {
 
   return (
     <header className="sticky top-0 z-40 mx-auto w-full max-w-7xl px-4 pt-3 sm:px-6">
-      <nav className="glass-strong flex h-14 items-center justify-between gap-4 rounded-2xl px-4 sm:px-6">
+      <nav
+        className="glass-strong flex h-14 items-center justify-between gap-4 rounded-2xl px-4 sm:px-6"
+        style={{ backdropFilter: `blur(${scrollBlur}px)`, WebkitBackdropFilter: `blur(${scrollBlur}px)` }}
+      >
         <Link to={isSupplier ? '/supplier' : '/'} className="flex items-center gap-2.5">
           <Brand />
         </Link>

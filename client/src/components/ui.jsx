@@ -10,22 +10,20 @@ export function Badge({ children, className = '' }) {
 
 export function Spinner({ className = 'h-6 w-6' }) {
   return (
-    <div
-      className={`animate-spin rounded-full border-[3px] border-current border-t-transparent ${className}`}
-      aria-label="Loading"
-    />
+    <div className={`relative ${className}`} aria-label="Loading">
+      <div className="absolute inset-0 rounded-full border-2 border-void-600" />
+      <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-gold-500 animate-spin" />
+    </div>
   );
 }
 
 export function EmptyState({ title, description, action }) {
   return (
-    <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-void-600 bg-void-800/50 px-6 py-16 text-center">
-      <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-void-700 text-2xl text-text-muted">
-        Fabric
-      </div>
+    <div className="glass-strong flex flex-col items-center justify-center rounded-2xl px-6 py-16 text-center">
+      <div className="empty-orb mb-6" />
       <h3 className="font-display text-xl font-semibold text-text-primary">{title}</h3>
-      {description && <p className="mt-1 max-w-sm text-sm text-text-secondary">{description}</p>}
-      {action && <div className="mt-5">{action}</div>}
+      {description && <p className="mt-2 max-w-sm text-sm text-text-secondary">{description}</p>}
+      {action && <div className="mt-6">{action}</div>}
     </div>
   );
 }

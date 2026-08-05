@@ -288,7 +288,7 @@ export default function ProductImage({ product, src, alt, className = '', rounde
       : null;
 
     return (
-      <div className={`${rounded ? 'rounded-xl' : ''} relative h-full w-full overflow-hidden ${className}`}>
+      <div data-fabric-image className={`${rounded ? 'rounded-xl' : ''} relative h-full w-full overflow-hidden ${className}`}>
         <img
           src={url}
           alt={alt || product?.name || 'Product'}
@@ -313,6 +313,7 @@ export default function ProductImage({ product, src, alt, className = '', rounde
 
   return (
     <div
+      data-fabric-image
       className={`${rounded ? 'rounded-xl' : ''} flex h-full w-full items-center justify-center overflow-hidden bg-void-700 ${className}`}
     >
       <img src={dataUri} alt={alt || product?.name || 'Product'} className="h-full w-full object-cover" />
