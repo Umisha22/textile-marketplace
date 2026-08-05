@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../../api/client.js';
 import { StatusBadge } from '../../components/ui.jsx';
 import ThreadLoader from '../../components/design-system/ThreadLoader.jsx';
@@ -11,6 +11,7 @@ import { useCurrency } from '../../hooks/useCurrency.js';
 
 export default function SupplierDashboard() {
   useCurrency();
+  const navigate = useNavigate();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [recs, setRecs] = useState(null);
@@ -47,7 +48,7 @@ export default function SupplierDashboard() {
           <h1 className="font-display text-3xl font-bold text-text-primary">Dashboard</h1>
           <p className="mt-1 text-sm text-text-secondary">A quick pulse on your marketplace activity.</p>
         </div>
-        <NeoButton onClick={() => window.location.href = '/supplier/products/new'} className="text-sm">
+        <NeoButton onClick={() => navigate('/supplier/products/new')} className="text-sm">
           + Add product
         </NeoButton>
       </div>
