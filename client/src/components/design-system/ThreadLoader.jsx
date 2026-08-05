@@ -1,10 +1,10 @@
 export default function ThreadLoader({ className = '', text = 'Loading…', fullPage = false }) {
   if (fullPage) {
     return (
-      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-6">
+      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-6 text-center">
         <div className="thread-wave-full" />
         {text && (
-          <div className="flex items-center gap-2">
+          <div className="flex flex-col items-center gap-3">
             <div className="thread-wave-loader">
               {Array.from({ length: 7 }).map((_, i) => (
                 <div key={i} className="strand" />
@@ -18,7 +18,7 @@ export default function ThreadLoader({ className = '', text = 'Loading…', full
   }
 
   return (
-    <div className={`flex flex-col items-center gap-4 ${className}`}>
+    <div className={`flex flex-col items-center gap-3 text-center ${className}`}>
       <div className="thread-wave-loader">
         {Array.from({ length: 7 }).map((_, i) => (
           <div key={i} className="strand" />

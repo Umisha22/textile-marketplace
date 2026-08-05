@@ -280,11 +280,12 @@ body {
 }
 
 .thread-wave-loader {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 3px;
   height: 24px;
+  margin: 0 auto;
 }
 .thread-wave-loader .strand {
   width: 3px;
@@ -292,6 +293,7 @@ body {
   border-radius: 2px;
   background: linear-gradient(180deg, var(--color-gold-500), var(--color-teal-500));
   animation: threadWavePulse 1.2s ease-in-out infinite;
+  flex-shrink: 0;
 }
 .thread-wave-loader .strand:nth-child(1) { animation-delay: 0s; }
 .thread-wave-loader .strand:nth-child(2) { animation-delay: 0.1s; }
