@@ -13,6 +13,7 @@ import CheckoutPage from './pages/CheckoutPage.jsx';
 import OrderConfirmationPage from './pages/OrderConfirmationPage.jsx';
 import AccountPage from './pages/AccountPage.jsx';
 import AssistantPage from './pages/AssistantPage.jsx';
+import FeaturesPage from './pages/FeaturesPage.jsx';
 import SupplierDashboard from './pages/supplier/SupplierDashboard.jsx';
 import SupplierProducts from './pages/supplier/SupplierProducts.jsx';
 import ProductForm from './pages/supplier/ProductForm.jsx';
@@ -76,6 +77,7 @@ export default function App() {
         <Route path="/products/:slug" element={<ProductDetailPage />} />
         <Route path="/compare" element={<ComparePage />} />
         <Route path="/assistant" element={<AssistantPage />} />
+        <Route path="/features" element={<FeaturesPage />} />
         <Route path="/login" element={<RedirectIfAuthed><LoginPage /></RedirectIfAuthed>} />
         <Route path="/onboarding" element={<RequireAuth><OnboardingPage /></RequireAuth>} />
         <Route

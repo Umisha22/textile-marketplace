@@ -40,7 +40,7 @@ export default function Navbar() {
             <>
               <NavLink to="/" className={(d) => `${navLink(d)} ${navLinkActive}`} end>Home</NavLink>
               <NavLink to="/products" className={(d) => `${navLink(d)} ${navLinkActive}`}>Fabric Library</NavLink>
-              <NavLink to="/#how-it-works" className={(d) => `${navLink(d)} ${navLinkActive}`}>How it works</NavLink>
+              <NavLink to="/features" className={(d) => `${navLink(d)} ${navLinkActive}`}>How it works</NavLink>
             </>
           ) : (
             <>
@@ -125,7 +125,7 @@ export default function Navbar() {
               <>
                 <Link to="/" onClick={() => setOpen(false)} className="rounded-xl px-3 py-2.5 text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-void-600/50">Home</Link>
                 <Link to="/products" onClick={() => setOpen(false)} className="rounded-xl px-3 py-2.5 text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-void-600/50">Fabric Library</Link>
-                <Link to="/#how-it-works" onClick={() => setOpen(false)} className="rounded-xl px-3 py-2.5 text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-void-600/50">How it works</Link>
+                <Link to="/features" onClick={() => setOpen(false)} className="rounded-xl px-3 py-2.5 text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-void-600/50">How it works</Link>
                 <Link to="/cart" onClick={() => setOpen(false)} className="rounded-xl px-3 py-2.5 text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-void-600/50">Cart ({count})</Link>
               </>
             ) : (
