@@ -66,6 +66,20 @@ body {
   line-height: 1.6;
 }
 
+/* ── Native Select Dropdowns — Dark Theme ── */
+select {
+  color-scheme: dark;
+  background-color: var(--color-void-700);
+  color: var(--color-text-primary);
+}
+select option {
+  background-color: var(--color-void-800);
+  color: var(--color-text-primary);
+}
+input, textarea {
+  color-scheme: dark;
+}
+
 .font-display { font-family: var(--font-display); }
 .font-mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
 

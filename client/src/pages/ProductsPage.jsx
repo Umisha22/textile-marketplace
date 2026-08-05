@@ -157,7 +157,7 @@ export default function ProductsPage() {
               )}
             </div>
             <select value={sort} onChange={(e) => updateParam('sort', e.target.value)}
-              className="rounded-lg border border-void-600 bg-void-700/50 px-3 py-2 text-sm text-text-secondary outline-none">
+              className="rounded-lg border border-void-600 bg-void-700/50 px-3 py-2 text-sm text-text-primary outline-none [&>option]:bg-void-800 [&>option]:text-text-primary focus:border-gold-500/30">
               <option value="newest">Newest first</option>
               <option value="price_asc">Price: low to high</option>
               <option value="price_desc">Price: high to low</option>
