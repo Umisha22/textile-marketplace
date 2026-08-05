@@ -18,7 +18,7 @@ export default function ThreadLoader({ className = '', text = 'Loading…', full
   }
 
   return (
-    <div className={`flex w-full flex-col items-center gap-3 text-center ${className}`}>
+    <div className={`flex w-full flex-col items-center justify-center gap-3 py-16 text-center ${className}`}>
       <div className="thread-wave-loader">
         {Array.from({ length: 7 }).map((_, i) => (
           <div key={i} className="strand" />
