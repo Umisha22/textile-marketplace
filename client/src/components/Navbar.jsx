@@ -6,9 +6,13 @@ import Brand from './Brand.jsx';
 import CurrencySwitcher from './CurrencySwitcher.jsx';
 
 const navLink = ({ isActive }) =>
-  `rounded-lg px-3 py-2 text-sm font-medium transition ${
-    isActive ? 'bg-brand-100 text-brand-900' : 'text-brand-700 hover:bg-cream-100'
+  `relative rounded-xl px-4 py-2 text-sm font-medium transition-all duration-300 ${
+    isActive
+      ? 'neo-pressed text-gold-400'
+      : 'text-text-secondary hover:text-text-primary hover:bg-void-600/50'
   }`;
+
+const navLinkActive = `after:absolute after:bottom-0 after:left-1/2 after:h-[2px] after:w-0 after:-translate-x-1/2 after:rounded-full after:bg-gold-500 after:transition-all after:duration-300 hover:after:w-4/5`;
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -25,8 +29,8 @@ export default function Navbar() {
   const isSupplier = user?.role === 'supplier';
 
   return (
-    <header className="sticky top-0 z-40 border-b border-brand-100 bg-cream-50/90 backdrop-blur">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
+    <header className="sticky top-0 z-40 mx-auto w-full max-w-7xl px-4 pt-3 sm:px-6">
+      <nav className="glass-strong flex h-14 items-center justify-between gap-4 rounded-2xl px-4 sm:px-6">
         <Link to={isSupplier ? '/supplier' : '/'} className="flex items-center gap-2.5">
           <Brand />
         </Link>
@@ -34,16 +38,16 @@ export default function Navbar() {
         <nav className="hidden items-center gap-1 md:flex">
           {!isSupplier ? (
             <>
-              <NavLink to="/" className={navLink} end>Home</NavLink>
-              <NavLink to="/products" className={navLink}>Fabric Library</NavLink>
-              <NavLink to="/assistant" className={navLink}>AI Assistant</NavLink>
+              <NavLink to="/" className={(d) => `${navLink(d)} ${navLinkActive}`} end>Home</NavLink>
+              <NavLink to="/products" className={(d) => `${navLink(d)} ${navLinkActive}`}>Fabric Library</NavLink>
+              <NavLink to="/assistant" className={(d) => `${navLink(d)} ${navLinkActive}`}>AI Assistant</NavLink>
             </>
           ) : (
             <>
-              <NavLink to="/supplier" className={navLink} end>Dashboard</NavLink>
-              <NavLink to="/supplier/products" className={navLink}>Inventory</NavLink>
-              <NavLink to="/supplier/orders" className={navLink}>Orders</NavLink>
-              <NavLink to="/supplier/profile" className={navLink}>Profile</NavLink>
+              <NavLink to="/supplier" className={(d) => `${navLink(d)} ${navLinkActive}`} end>Dashboard</NavLink>
+              <NavLink to="/supplier/products" className={(d) => `${navLink(d)} ${navLinkActive}`}>Inventory</NavLink>
+              <NavLink to="/supplier/orders" className={(d) => `${navLink(d)} ${navLinkActive}`}>Orders</NavLink>
+              <NavLink to="/supplier/profile" className={(d) => `${navLink(d)} ${navLinkActive}`}>Profile</NavLink>
             </>
           )}
         </nav>
@@ -53,16 +57,16 @@ export default function Navbar() {
           {!isSupplier && (
             <Link
               to="/cart"
-              className="relative flex h-10 w-10 items-center justify-center rounded-xl border border-brand-200 text-brand-800 transition hover:border-brand-400 hover:bg-white"
+              className="neo-flat relative flex h-10 w-10 items-center justify-center rounded-xl text-text-secondary transition-all duration-300 hover:text-gold-400 hover:shadow-[0_0_20px_rgba(212,168,83,0.1)]"
               title="Cart"
             >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="9" cy="21" r="1.4" />
                 <circle cx="19" cy="21" r="1.4" />
                 <path d="M2.5 3h2l2.6 12.5a2 2 0 0 0 2 1.5h8.8a2 2 0 0 0 2-1.6L21.5 8H6.1" />
               </svg>
               {count > 0 && (
-                <span className="absolute -right-1.5 -top-1.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-clay-500 px-1 text-[11px] font-bold text-white">
+                <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-gold-500 px-1 text-[10px] font-bold text-void-950">
                   {count}
                 </span>
               )}
@@ -73,9 +77,9 @@ export default function Navbar() {
             <div className="flex items-center gap-2">
               <Link
                 to={isSupplier ? '/supplier' : '/account'}
-                className="hidden items-center gap-2 rounded-xl bg-brand-800 px-3.5 py-2 text-sm font-semibold text-white transition hover:bg-brand-700 sm:flex"
+                className="neo-flat hidden items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-text-primary transition-all duration-300 hover:text-gold-400 sm:flex"
               >
-                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-cream-100 text-xs font-bold text-brand-900">
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-gold-500/20 text-xs font-bold text-gold-400">
                   {user.name?.[0]?.toUpperCase()}
                 </span>
                 {user.name?.split(' ')[0]}
@@ -83,7 +87,7 @@ export default function Navbar() {
               <button
                 type="button"
                 onClick={handleLogout}
-                className="rounded-xl border border-brand-200 px-3 py-2 text-sm font-semibold text-brand-700 transition hover:border-clay-300 hover:text-clay-600"
+                className="rounded-xl px-3 py-2 text-sm font-medium text-text-secondary transition hover:text-coral-400"
               >
                 Logout
               </button>
@@ -92,13 +96,13 @@ export default function Navbar() {
             <div className="hidden items-center gap-2 sm:flex">
               <Link
                 to="/login"
-                className="rounded-xl px-3.5 py-2 text-sm font-semibold text-brand-800 transition hover:bg-cream-100"
+                className="rounded-xl px-4 py-2 text-sm font-medium text-text-secondary transition hover:text-text-primary"
               >
                 Log in
               </Link>
               <Link
                 to="/login?mode=register"
-                className="rounded-xl bg-clay-500 px-3.5 py-2 text-sm font-semibold text-white transition hover:bg-clay-600"
+                className="neo-raised rounded-xl bg-gold-500 px-4 py-2 text-sm font-bold text-void-950 transition-all duration-300 hover:bg-gold-400"
               >
                 Join now
               </Link>
@@ -108,44 +112,44 @@ export default function Navbar() {
           <button
             type="button"
             onClick={() => setOpen(!open)}
-            className="flex h-10 w-10 items-center justify-center rounded-xl border border-brand-200 text-brand-800 md:hidden"
+            className="neo-flat flex h-10 w-10 items-center justify-center rounded-xl text-text-secondary md:hidden"
             aria-label="Menu"
           >
             {open ? (
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M6 6l12 12M18 6L6 18" /></svg>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M6 6l12 12M18 6L6 18" /></svg>
             ) : (
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
             )}
           </button>
         </div>
-      </div>
+      </nav>
 
       {open && (
-        <nav className="border-t border-brand-100 bg-cream-50 px-4 py-3 md:hidden">
+        <nav className="glass-strong mt-2 rounded-2xl px-4 py-3 md:hidden">
           <div className="flex flex-col gap-1">
             {!isSupplier ? (
               <>
-                <Link to="/" onClick={() => setOpen(false)} className="rounded-lg px-3 py-2 text-sm font-medium text-brand-800 hover:bg-cream-100">Home</Link>
-                <Link to="/products" onClick={() => setOpen(false)} className="rounded-lg px-3 py-2 text-sm font-medium text-brand-800 hover:bg-cream-100">Fabric Library</Link>
-                <Link to="/assistant" onClick={() => setOpen(false)} className="rounded-lg px-3 py-2 text-sm font-medium text-brand-800 hover:bg-cream-100">AI Assistant</Link>
-                <Link to="/cart" onClick={() => setOpen(false)} className="rounded-lg px-3 py-2 text-sm font-medium text-brand-800 hover:bg-cream-100">Cart ({count})</Link>
+                <Link to="/" onClick={() => setOpen(false)} className="rounded-xl px-3 py-2.5 text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-void-600/50">Home</Link>
+                <Link to="/products" onClick={() => setOpen(false)} className="rounded-xl px-3 py-2.5 text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-void-600/50">Fabric Library</Link>
+                <Link to="/assistant" onClick={() => setOpen(false)} className="rounded-xl px-3 py-2.5 text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-void-600/50">AI Assistant</Link>
+                <Link to="/cart" onClick={() => setOpen(false)} className="rounded-xl px-3 py-2.5 text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-void-600/50">Cart ({count})</Link>
               </>
             ) : (
               <>
-                <Link to="/supplier" onClick={() => setOpen(false)} className="rounded-lg px-3 py-2 text-sm font-medium text-brand-800 hover:bg-cream-100">Dashboard</Link>
-                <Link to="/supplier/products" onClick={() => setOpen(false)} className="rounded-lg px-3 py-2 text-sm font-medium text-brand-800 hover:bg-cream-100">Inventory</Link>
-                <Link to="/supplier/orders" onClick={() => setOpen(false)} className="rounded-lg px-3 py-2 text-sm font-medium text-brand-800 hover:bg-cream-100">Orders</Link>
-                <Link to="/supplier/profile" onClick={() => setOpen(false)} className="rounded-lg px-3 py-2 text-sm font-medium text-brand-800 hover:bg-cream-100">Profile</Link>
+                <Link to="/supplier" onClick={() => setOpen(false)} className="rounded-xl px-3 py-2.5 text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-void-600/50">Dashboard</Link>
+                <Link to="/supplier/products" onClick={() => setOpen(false)} className="rounded-xl px-3 py-2.5 text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-void-600/50">Inventory</Link>
+                <Link to="/supplier/orders" onClick={() => setOpen(false)} className="rounded-xl px-3 py-2.5 text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-void-600/50">Orders</Link>
+                <Link to="/supplier/profile" onClick={() => setOpen(false)} className="rounded-xl px-3 py-2.5 text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-void-600/50">Profile</Link>
               </>
             )}
             {!user && (
-              <div className="mt-2 flex gap-2 border-t border-brand-100 pt-3">
-                <Link to="/login" onClick={() => setOpen(false)} className="flex-1 rounded-lg border border-brand-300 px-3 py-2 text-center text-sm font-semibold text-brand-800">Log in</Link>
-                <Link to="/login?mode=register" onClick={() => setOpen(false)} className="flex-1 rounded-lg bg-clay-500 px-3 py-2 text-center text-sm font-semibold text-white">Join now</Link>
+              <div className="mt-2 flex gap-2 border-t border-void-600 pt-3">
+                <Link to="/login" onClick={() => setOpen(false)} className="flex-1 rounded-xl border border-gold-500/20 px-3 py-2.5 text-center text-sm font-semibold text-gold-400">Log in</Link>
+                <Link to="/login?mode=register" onClick={() => setOpen(false)} className="flex-1 rounded-xl bg-gold-500 px-3 py-2.5 text-center text-sm font-bold text-void-950">Join now</Link>
               </div>
             )}
             {user && (
-              <button type="button" onClick={handleLogout} className="mt-2 rounded-lg border border-brand-200 px-3 py-2 text-left text-sm font-semibold text-clay-600">
+              <button type="button" onClick={handleLogout} className="mt-2 rounded-xl px-3 py-2.5 text-left text-sm font-semibold text-coral-400">
                 Logout
               </button>
             )}

@@ -53,10 +53,14 @@ function RedirectIfAuthed({ children }) {
 
 export function FullScreenLoader() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-cream-50">
+    <div className="flex min-h-screen items-center justify-center bg-void-950">
       <div className="flex flex-col items-center gap-4">
-        <div className="h-10 w-10 animate-spin rounded-full border-4 border-brand-200 border-t-brand-600" />
-        <p className="text-sm text-brand-700">Loading Astra Threads…</p>
+        <div className="relative h-1 w-32 overflow-hidden rounded-full bg-void-700">
+          <div className="absolute inset-y-0 left-0 w-full origin-left animate-[threadWeave_1.5s_cubic-bezier(0.34,1.56,0.64,1)_infinite]">
+            <div className="h-full w-full rounded-full bg-gradient-to-r from-gold-500 via-teal-500 to-gold-500" />
+          </div>
+        </div>
+        <p className="text-xs font-mono text-text-secondary">Loading Astra Threads…</p>
       </div>
     </div>
   );

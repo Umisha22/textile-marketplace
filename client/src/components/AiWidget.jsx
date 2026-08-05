@@ -19,23 +19,23 @@ export default function AiWidget() {
   return (
     <>
       {open && (
-        <div className="fixed inset-0 z-50 bg-brand-950/40 backdrop-blur-sm" onClick={() => setOpen(false)} />
+        <div className="fixed inset-0 z-50 bg-void-950/60 backdrop-blur-sm" onClick={() => setOpen(false)} />
       )}
 
       <div
-        className={`fixed bottom-5 right-4 z-50 flex flex-col overflow-hidden rounded-2xl border border-brand-100 bg-white shadow-lift transition-all sm:right-6 ${
+        className={`fixed bottom-5 right-4 z-50 flex flex-col overflow-hidden glass-strong rounded-2xl shadow-[0_8px_40px_rgba(0,0,0,0.5)] transition-all sm:right-6 ${
           open ? 'h-[70vh] w-[calc(100vw-2rem)] max-w-md' : 'h-0 w-0 border-0'
         }`}
       >
         {open && (
           <>
-            <div className="flex items-center justify-between border-b border-brand-100 bg-brand-900 px-4 py-3 text-white">
+            <div className="flex items-center justify-between border-b border-void-600/50 bg-void-800/80 px-4 py-3">
               <div className="flex items-center gap-2.5">
-                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-cream-100 text-brand-900">🧶</span>
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-gold-500/20 text-sm">🧶</span>
                 <div>
-                  <p className="text-sm font-semibold">Weaver AI</p>
-                  <p className="flex items-center gap-1.5 text-[11px] text-brand-200">
-                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" /> Online · fabric assistant
+                  <p className="text-sm font-semibold text-text-primary">Weaver AI</p>
+                  <p className="flex items-center gap-1.5 text-[11px] text-text-secondary">
+                    <span className="h-1.5 w-1.5 rounded-full bg-teal-500" /> Online · fabric assistant
                   </p>
                 </div>
               </div>
@@ -43,14 +43,14 @@ export default function AiWidget() {
                 <Link
                   to="/assistant"
                   onClick={() => setOpen(false)}
-                  className="rounded-lg px-2.5 py-1.5 text-xs font-medium text-brand-100 hover:bg-brand-800"
+                  className="rounded-lg px-2.5 py-1.5 text-xs font-medium text-text-secondary hover:text-text-primary hover:bg-void-600/50"
                 >
                   Expand
                 </Link>
                 <button
                   type="button"
                   onClick={() => setOpen(false)}
-                  className="rounded-lg px-2 py-1.5 text-brand-200 hover:bg-brand-800"
+                  className="rounded-lg px-2 py-1.5 text-text-secondary hover:text-text-primary hover:bg-void-600/50"
                   aria-label="Close"
                 >
                   ✕
@@ -72,7 +72,7 @@ export default function AiWidget() {
         <button
           type="button"
           onClick={openPanel}
-          className="fixed bottom-5 right-4 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-brand-800 text-white shadow-lift transition hover:scale-105 hover:bg-brand-700 sm:right-6"
+          className="fixed bottom-5 right-4 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-gold-500 text-void-950 shadow-[0_0_30px_rgba(212,168,83,0.3)] transition-all duration-300 hover:scale-105 hover:shadow-[0_0_50px_rgba(212,168,83,0.4)] sm:right-6"
           title="Chat with Weaver AI"
         >
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">

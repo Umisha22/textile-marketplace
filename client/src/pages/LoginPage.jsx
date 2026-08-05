@@ -44,29 +44,29 @@ export default function LoginPage() {
 
   return (
     <div className="mx-auto flex max-w-md flex-col px-4 py-14">
-      <div className="rounded-3xl border border-brand-100 bg-white p-8 shadow-lift">
+      <div className="glass-strong rounded-3xl p-8">
         <div className="text-center">
           <Brand className="mx-auto justify-center" />
-          <h1 className="mt-4 font-display text-2xl font-bold text-brand-900">
+          <h1 className="mt-4 font-display text-2xl font-bold text-text-primary">
             {mode === 'register' ? 'Create your account' : 'Welcome back'}
           </h1>
-          <p className="mt-1 text-sm text-brand-500">
+          <p className="mt-1 text-sm text-text-secondary">
             {mode === 'register' ? 'Join Astra Threads as a buyer or supplier.' : 'Log in to continue sourcing.'}
           </p>
         </div>
 
-        <div className="mt-6 grid grid-cols-2 rounded-xl bg-brand-50 p-1 text-sm font-semibold">
+        <div className="mt-6 grid grid-cols-2 rounded-xl bg-void-700 p-1 text-sm font-semibold">
           <button
             type="button"
             onClick={() => setMode('login')}
-            className={`rounded-lg py-2 transition ${mode === 'login' ? 'bg-white text-brand-900 shadow-soft' : 'text-brand-500'}`}
+            className={`rounded-lg py-2 transition-all duration-300 ${mode === 'login' ? 'neo-pressed text-gold-400' : 'text-text-secondary hover:text-text-primary'}`}
           >
             Log in
           </button>
           <button
             type="button"
             onClick={() => setMode('register')}
-            className={`rounded-lg py-2 transition ${mode === 'register' ? 'bg-white text-brand-900 shadow-soft' : 'text-brand-500'}`}
+            className={`rounded-lg py-2 transition-all duration-300 ${mode === 'register' ? 'neo-pressed text-gold-400' : 'text-text-secondary hover:text-text-primary'}`}
           >
             Register
           </button>
@@ -74,19 +74,27 @@ export default function LoginPage() {
 
         {mode === 'register' && (
           <div className="mt-4">
-            <p className="text-xs font-semibold uppercase tracking-wider text-brand-400">I am joining as</p>
+            <p className="text-xs font-semibold uppercase tracking-wider text-text-muted">I am joining as</p>
             <div className="mt-2 grid grid-cols-2 gap-2">
               <button
                 type="button"
                 onClick={() => setRole('buyer')}
-                className={`rounded-xl border px-3 py-2.5 text-sm font-semibold transition ${role === 'buyer' ? 'border-brand-600 bg-brand-600 text-white' : 'border-brand-200 text-brand-700 hover:border-brand-400'}`}
+                className={`rounded-xl border px-3 py-2.5 text-sm font-semibold transition-all duration-300 ${
+                  role === 'buyer'
+                    ? 'neo-pressed border-gold-500/30 text-gold-400'
+                    : 'neo-flat border-void-600 text-text-secondary hover:border-gold-500/20'
+                }`}
               >
                 🛍️ Buyer
               </button>
               <button
                 type="button"
                 onClick={() => setRole('supplier')}
-                className={`rounded-xl border px-3 py-2.5 text-sm font-semibold transition ${role === 'supplier' ? 'border-brand-600 bg-brand-600 text-white' : 'border-brand-200 text-brand-700 hover:border-brand-400'}`}
+                className={`rounded-xl border px-3 py-2.5 text-sm font-semibold transition-all duration-300 ${
+                  role === 'supplier'
+                    ? 'neo-pressed border-gold-500/30 text-gold-400'
+                    : 'neo-flat border-void-600 text-text-secondary hover:border-gold-500/20'
+                }`}
               >
                 🏭 Supplier
               </button>
@@ -97,41 +105,41 @@ export default function LoginPage() {
         <form onSubmit={submit} className="mt-5 space-y-4">
           {mode === 'register' && (
             <div>
-              <label className="text-sm font-medium text-brand-800">{role === 'supplier' ? 'Business / contact name' : 'Full name'}</label>
-              <input value={form.name} onChange={set('name')} required placeholder="Your name" className="mt-1.5 w-full rounded-xl border border-brand-200 bg-cream-50 px-4 py-2.5 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100" />
+              <label className="text-sm font-medium text-text-secondary">{role === 'supplier' ? 'Business / contact name' : 'Full name'}</label>
+              <input value={form.name} onChange={set('name')} required placeholder="Your name" className="mt-1.5 w-full rounded-xl border border-void-600 bg-void-700/50 px-4 py-2.5 text-sm text-text-primary placeholder:text-text-muted outline-none focus:border-gold-500/30 focus:ring-1 focus:ring-gold-500/20" />
             </div>
           )}
           <div>
-            <label className="text-sm font-medium text-brand-800">Email</label>
-            <input type="email" value={form.email} onChange={set('email')} required placeholder="you@company.com" className="mt-1.5 w-full rounded-xl border border-brand-200 bg-cream-50 px-4 py-2.5 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100" />
+            <label className="text-sm font-medium text-text-secondary">Email</label>
+            <input type="email" value={form.email} onChange={set('email')} required placeholder="you@company.com" className="mt-1.5 w-full rounded-xl border border-void-600 bg-void-700/50 px-4 py-2.5 text-sm text-text-primary placeholder:text-text-muted outline-none focus:border-gold-500/30 focus:ring-1 focus:ring-gold-500/20" />
           </div>
           <div>
-            <label className="text-sm font-medium text-brand-800">Password</label>
-            <input type="password" value={form.password} onChange={set('password')} required minLength={6} placeholder="••••••••" className="mt-1.5 w-full rounded-xl border border-brand-200 bg-cream-50 px-4 py-2.5 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100" />
+            <label className="text-sm font-medium text-text-secondary">Password</label>
+            <input type="password" value={form.password} onChange={set('password')} required minLength={6} placeholder="••••••••" className="mt-1.5 w-full rounded-xl border border-void-600 bg-void-700/50 px-4 py-2.5 text-sm text-text-primary placeholder:text-text-muted outline-none focus:border-gold-500/30 focus:ring-1 focus:ring-gold-500/20" />
           </div>
 
-          {error && <p className="rounded-lg bg-clay-50 px-3 py-2 text-sm text-clay-700">{error}</p>}
+          {error && <p className="rounded-lg bg-coral-500/10 border border-coral-500/20 px-3 py-2 text-sm text-coral-400">{error}</p>}
 
           <button
             type="submit"
             disabled={loading}
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-clay-500 py-3 text-sm font-bold text-white transition hover:bg-clay-600 disabled:opacity-60"
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-gold-500 py-3 text-sm font-bold text-void-950 transition-all duration-300 hover:bg-gold-400 neo-raised disabled:opacity-60"
           >
             {loading && <Spinner className="h-4 w-4" />}
             {mode === 'register' ? 'Create account' : 'Log in'}
           </button>
         </form>
 
-        <p className="mt-5 text-center text-sm text-brand-500">
+        <p className="mt-5 text-center text-sm text-text-secondary">
           {mode === 'register' ? 'Already have an account?' : "New to Astra Threads?"}{' '}
-          <button type="button" onClick={() => setMode(mode === 'register' ? 'login' : 'register')} className="font-semibold text-brand-700 hover:underline">
+          <button type="button" onClick={() => setMode(mode === 'register' ? 'login' : 'register')} className="font-semibold text-gold-400 hover:text-gold-300">
             {mode === 'register' ? 'Log in' : 'Register'}
           </button>
         </p>
       </div>
 
-      <p className="mt-4 text-center text-xs text-brand-400">
-        By continuing you agree to the prototype terms. Payments & logistics are out of scope for this hackathon demo.
+      <p className="mt-4 text-center text-xs text-text-muted">
+        By continuing you agree to the prototype terms. Payments & logistics are out of scope.
       </p>
     </div>
   );
