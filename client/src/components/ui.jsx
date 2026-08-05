@@ -8,12 +8,15 @@ export function Badge({ children, className = '' }) {
   );
 }
 
-export function Spinner({ className = 'h-6 w-6' }) {
+export function Spinner({ className = '' }) {
   return (
-    <div className={`relative ${className}`} aria-label="Loading">
-      <div className="absolute inset-0 rounded-full border-2 border-void-600" />
-      <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-gold-500 animate-spin" />
-    </div>
+    <span className={`inline-flex items-center gap-1 ${className}`} aria-label="Loading">
+      <span className="thread-wave-loader !h-4 !gap-0.5">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <span key={i} className="strand !w-[2px]" style={{ animationDelay: `${i * 0.1}s` }} />
+        ))}
+      </span>
+    </span>
   );
 }
 

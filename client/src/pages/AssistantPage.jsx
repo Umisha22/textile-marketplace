@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import ChatWindow from '../components/ChatWindow.jsx';
 import ProductCard from '../components/ProductCard.jsx';
 import PhotoSearch from '../components/PhotoSearch.jsx';
-import { Spinner } from '../components/ui.jsx';
+import ThreadLoader from '../components/design-system/ThreadLoader.jsx';
 import { useAiChat } from '../hooks/useAiChat.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import { api } from '../api/client.js';
@@ -87,7 +87,7 @@ export default function AssistantPage() {
                   <Link to="/login" className="font-semibold text-gold-400 underline">Log in</Link> and complete onboarding for AI-curated recommendations.
                 </p>
               ) : recLoading ? (
-                <div className="flex justify-center py-8"><Spinner className="h-6 w-6 text-gold-400" /></div>
+                <ThreadLoader text="Loading assistant…" />
               ) : (
                 <div className="mt-4 space-y-3">
                   {recommended.map((p) => (

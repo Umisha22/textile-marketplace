@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { api } from '../../api/client.js';
-import { Spinner, StatusBadge, EmptyState } from '../../components/ui.jsx';
+import { StatusBadge, EmptyState } from '../../components/ui.jsx';
+import ThreadLoader from '../../components/design-system/ThreadLoader.jsx';
 import GlassPanel from '../../components/design-system/GlassPanel.jsx';
 import NeoButton from '../../components/design-system/NeoButton.jsx';
 import { useToast } from '../../context/ToastContext.jsx';
@@ -77,7 +78,7 @@ export default function SupplierOrders() {
       </div>
 
       {loading ? (
-        <div className="flex justify-center py-24"><Spinner className="h-10 w-10 text-gold-400" /></div>
+        <ThreadLoader text="Loading orders…" />
       ) : orders.length === 0 ? (
         <div className="mt-8">
           <EmptyState

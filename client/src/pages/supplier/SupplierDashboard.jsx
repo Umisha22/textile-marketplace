@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../../api/client.js';
-import { Spinner, StatusBadge } from '../../components/ui.jsx';
+import { StatusBadge } from '../../components/ui.jsx';
+import ThreadLoader from '../../components/design-system/ThreadLoader.jsx';
 import FabricIcon from '../../components/FabricIcon.jsx';
 import GlassPanel from '../../components/design-system/GlassPanel.jsx';
 import NeoButton from '../../components/design-system/NeoButton.jsx';
@@ -27,7 +28,7 @@ export default function SupplierDashboard() {
   }, []);
 
   if (loading) {
-    return <div className="flex justify-center py-24"><Spinner className="h-10 w-10 text-gold-400" /></div>;
+    return <ThreadLoader text="Loading dashboard…" />;
   }
 
   const s = data?.stats || {};

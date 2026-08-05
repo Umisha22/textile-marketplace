@@ -2,7 +2,8 @@ import { useCallback, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../../api/client.js';
 import ProductImage from '../../components/ProductImage.jsx';
-import { Spinner, EmptyState } from '../../components/ui.jsx';
+import { EmptyState } from '../../components/ui.jsx';
+import ThreadLoader from '../../components/design-system/ThreadLoader.jsx';
 import NeoButton from '../../components/design-system/NeoButton.jsx';
 import { useToast } from '../../context/ToastContext.jsx';
 import { formatPrice } from '../../utils/format.js';
@@ -50,7 +51,7 @@ export default function SupplierProducts() {
   };
 
   if (loading) {
-    return <div className="flex justify-center py-24"><Spinner className="h-10 w-10 text-gold-400" /></div>;
+    return <ThreadLoader text="Loading inventory…" />;
   }
 
   return (

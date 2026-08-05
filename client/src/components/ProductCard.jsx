@@ -11,26 +11,26 @@ export default function ProductCard({ product, onCompareToggle, compareActive })
   const eco = product.sustainability?.score;
 
   return (
-    <div className="group relative flex flex-col overflow-hidden neo-raised rounded-2xl transition-all duration-400 hover:-translate-y-1 hover:shadow-[var(--shadow-neo-hover)]">
-      <Link to={`/products/${product.slug}`} className="relative block aspect-[4/3] overflow-hidden">
+    <div className="group relative flex flex-col overflow-hidden neo-raised rounded-3xl transition-all duration-400 hover:-translate-y-1.5 hover:shadow-[var(--shadow-neo-hover)]">
+      <Link to={`/products/${product.slug}`} data-fabric-image className="relative block aspect-[4/3] overflow-hidden rounded-t-3xl">
         <ProductImage product={product} alt={product.name} className="transition duration-500 group-hover:scale-105" />
         {out && (
-          <span className="absolute inset-0 flex items-center justify-center bg-void-950/70 text-sm font-semibold uppercase tracking-wide text-text-primary">
+          <span className="absolute inset-0 flex items-center justify-center bg-void-950/70 text-sm font-semibold uppercase tracking-wide text-text-primary backdrop-blur-sm">
             Out of stock
           </span>
         )}
         {product.featured && !out && (
-          <span className="absolute left-3 top-3 rounded-full bg-gold-500 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-void-950 shadow">
+          <span className="absolute left-3 top-3 rounded-full bg-gold-500 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-void-950 shadow-lg">
             Featured
           </span>
         )}
         {eco > 0 && (
-          <span className="absolute left-3 bottom-3 rounded-full bg-teal-500/90 px-2.5 py-1 text-[11px] font-bold text-void-950 shadow" title="Eco score">
+          <span className="absolute left-3 bottom-3 rounded-full bg-teal-500/90 px-2.5 py-1 text-[11px] font-bold text-void-950 shadow-lg backdrop-blur-sm" title="Eco score">
             🌿 {eco}
           </span>
         )}
         {compareActive && (
-          <span className="absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-full bg-gold-500 text-sm font-bold text-void-950 shadow">
+          <span className="absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-full bg-gold-500 text-sm font-bold text-void-950 shadow-lg">
             ✓
           </span>
         )}
@@ -48,7 +48,7 @@ export default function ProductCard({ product, onCompareToggle, compareActive })
           )}
         </div>
         <Link to={`/products/${product.slug}`}
-          className="line-clamp-2 font-display text-[15px] font-semibold leading-snug text-text-primary transition hover:text-gold-400">
+          className="line-clamp-2 font-display text-[15px] font-semibold leading-snug text-text-primary transition-colors duration-300 hover:text-gold-400">
           {product.name}
         </Link>
 
@@ -67,12 +67,12 @@ export default function ProductCard({ product, onCompareToggle, compareActive })
 
         <div className="mt-2 flex gap-2">
           <Link to={`/products/${product.slug}`}
-            className="flex-1 rounded-lg bg-gold-500/10 px-3 py-2 text-center text-sm font-semibold text-gold-400 transition hover:bg-gold-500/20">
+            className="neo-raised-gold flex-1 rounded-xl px-3 py-2 text-center text-sm font-semibold transition-all duration-300 hover:shadow-[0_0_20px_rgba(212,168,83,0.15)]">
             View
           </Link>
           {onCompareToggle && (
             <button type="button" onClick={() => onCompareToggle(product)}
-              className={`neo-flat rounded-lg px-3 py-2 text-xs font-semibold transition ${compareActive ? 'neo-pressed text-gold-400' : 'text-text-secondary hover:text-text-primary'}`}
+              className={`neo-flat rounded-xl px-3 py-2 text-xs font-semibold transition-all duration-300 ${compareActive ? 'neo-pressed text-gold-400' : 'text-text-secondary hover:text-text-primary'}`}
               title="Add to compare">
               ⚖
             </button>

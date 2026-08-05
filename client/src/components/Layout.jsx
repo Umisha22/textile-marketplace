@@ -4,7 +4,6 @@ import Navbar from './Navbar.jsx';
 import Footer from './Footer.jsx';
 import AiWidget from './AiWidget.jsx';
 import ParticleBackground from './design-system/ParticleBackground.jsx';
-import CustomCursor from './design-system/CustomCursor.jsx';
 import PageTransition from './design-system/PageTransition.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 
@@ -28,7 +27,6 @@ export default function Layout() {
 
   return (
     <div className="relative flex min-h-screen flex-col bg-void-950">
-      <CustomCursor />
       <ScrollProgress />
       <ParticleBackground />
       <div className="relative z-10 flex flex-1 flex-col">

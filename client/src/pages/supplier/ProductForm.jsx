@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { api } from '../../api/client.js';
 import { Spinner } from '../../components/ui.jsx';
+import ThreadLoader from '../../components/design-system/ThreadLoader.jsx';
 import GlassPanel from '../../components/design-system/GlassPanel.jsx';
 import NeoButton from '../../components/design-system/NeoButton.jsx';
 import { useToast } from '../../context/ToastContext.jsx';
@@ -132,7 +133,7 @@ export default function ProductForm() {
   const inputCls = 'w-full rounded-xl border border-void-600 bg-void-700/50 px-4 py-2.5 text-sm text-text-primary placeholder:text-text-muted outline-none focus:border-gold-500/30 focus:ring-1 focus:ring-gold-500/20';
 
   if (loading) {
-    return <div className="flex justify-center py-24"><Spinner className="h-10 w-10 text-gold-400" /></div>;
+    return <ThreadLoader text="Loading product…" />;
   }
 
   return (

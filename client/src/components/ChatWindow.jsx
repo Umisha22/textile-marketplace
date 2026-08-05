@@ -234,7 +234,7 @@ export default function ChatWindow({
             type="button"
             onClick={() => submit()}
             disabled={!input.trim() || loading}
-            className="flex h-11 shrink-0 items-center gap-1.5 rounded-xl neo-raised-gold px-4 text-sm font-bold transition disabled:opacity-50"
+            className="flex h-11 shrink-0 items-center gap-1.5 rounded-2xl neo-raised-gold px-4 text-sm font-bold transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-[0_0_20px_rgba(212,168,83,0.2)] active:scale-95 focus:outline-none focus:ring-2 focus:ring-gold-500/40"
           >
             Send
             <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">

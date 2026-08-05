@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../api/client.js';
-import { Spinner, StatusBadge, EmptyState } from '../components/ui.jsx';
+import { StatusBadge, EmptyState } from '../components/ui.jsx';
+import ThreadLoader from '../components/design-system/ThreadLoader.jsx';
 import GlassPanel from '../components/design-system/GlassPanel.jsx';
 import NeoButton from '../components/design-system/NeoButton.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
@@ -78,7 +79,7 @@ export default function AccountPage() {
         <div>
           <h2 className="font-display text-lg font-bold text-text-primary">My orders</h2>
           {loading ? (
-            <div className="flex justify-center py-20"><Spinner className="h-8 w-8 text-gold-400" /></div>
+            <ThreadLoader text="Loading account…" />
           ) : orders.length === 0 ? (
             <div className="mt-4">
               <EmptyState

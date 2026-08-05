@@ -6,6 +6,7 @@ import ProductCard from '../components/ProductCard.jsx';
 import FabricIcon from '../components/FabricIcon.jsx';
 import GlassPanel from '../components/design-system/GlassPanel.jsx';
 import NeoButton from '../components/design-system/NeoButton.jsx';
+import ThreadLoader from '../components/design-system/ThreadLoader.jsx';
 import { Spinner } from '../components/ui.jsx';
 import { useCart } from '../context/CartContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
@@ -56,7 +57,7 @@ export default function ProductDetailPage() {
     } catch (e) { setAiAnswer(`Sorry: ${e.message}`); } finally { setAiAsking(false); }
   }, [product, aiAsking]);
 
-  if (loading) return <div className="flex justify-center py-32"><Spinner className="h-10 w-10 text-gold-500" /></div>;
+  if (loading) return <ThreadLoader text="Loading fabric…" fullPage />;
 
   if (!product) return (
     <div className="mx-auto max-w-2xl px-4 py-24 text-center">

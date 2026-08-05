@@ -7,6 +7,7 @@ export default function NeoButton({
   size = 'md',
   className = '',
   disabled = false,
+  loading = false,
   onClick,
   ...props
 }) {
@@ -14,17 +15,17 @@ export default function NeoButton({
   const btnRef = useRef(null);
 
   const colorMap = {
-    gold: color === 'gold' ? '' : 'bg-gold-500 text-void-950 hover:bg-gold-400 active:bg-gold-600',
-    teal: 'bg-teal-500 text-void-950 hover:bg-teal-400 active:bg-teal-600',
-    coral: 'bg-coral-500 text-white hover:bg-coral-400 active:bg-coral-600',
-    ghost: 'bg-transparent border border-gold-500/30 text-gold-400 hover:bg-gold-500/10 hover:border-gold-500/50',
-    'ghost-teal': 'bg-transparent border border-teal-500/30 text-teal-400 hover:bg-teal-500/10 hover:border-teal-500/50',
+    gold: color === 'gold' ? '' : 'bg-gold-500 text-void-950',
+    teal: 'bg-teal-500 text-void-950',
+    coral: 'bg-coral-500 text-white',
+    ghost: 'bg-transparent border border-gold-500/30 text-gold-400 hover:bg-gold-500/10',
+    'ghost-teal': 'bg-transparent border border-teal-500/30 text-teal-400 hover:bg-teal-500/10',
   };
 
   const sizeMap = {
-    sm: 'px-4 py-2 text-xs rounded-lg',
-    md: 'px-6 py-3 text-sm rounded-xl',
-    lg: 'px-8 py-4 text-base rounded-xl',
+    sm: 'px-4 py-2 text-xs rounded-xl',
+    md: 'px-6 py-3 text-sm rounded-2xl',
+    lg: 'px-8 py-4 text-base rounded-2xl',
   };
 
   const shadowMap = {
@@ -33,7 +34,7 @@ export default function NeoButton({
   };
 
   const spawnRipple = (e) => {
-    if (disabled) return;
+    if (disabled || loading) return;
     const btn = btnRef.current;
     if (!btn) return;
     const rect = btn.getBoundingClientRect();
@@ -53,22 +54,33 @@ export default function NeoButton({
     <button
       ref={btnRef}
       className={`
-        font-semibold transition-all duration-300 ease-out btn-ripple
+        font-semibold btn-ripple
+        transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]
         ${colorMap[color] || colorMap.gold}
         ${sizeMap[size] || sizeMap.md}
         ${variant !== 'ghost' && variant !== 'ghost-teal' ? shadowMap[variant] || shadowMap.raised : ''}
         ${disabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer active:scale-[0.97]'}
+        focus:outline-none focus:ring-2 focus:ring-gold-500/40 focus:ring-offset-2 focus:ring-offset-void-950
         thread-border
         ${className}
       `}
-      disabled={disabled}
-      onMouseDown={(e) => { if (!disabled) { setPressed(true); spawnRipple(e); } }}
+      disabled={disabled || loading}
+      onMouseDown={(e) => { if (!disabled && !loading) { setPressed(true); spawnRipple(e); } }}
       onMouseUp={() => setPressed(false)}
       onMouseLeave={() => setPressed(false)}
       onClick={onClick}
       {...props}
     >
-      {children}
+      {loading ? (
+        <span className="flex items-center gap-2">
+          <span className="thread-wave-loader !h-4">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="strand !h-4" style={{ animationDelay: `${i * 0.1}s` }} />
+            ))}
+          </span>
+          <span className="opacity-70">{children}</span>
+        </span>
+      ) : children}
     </button>
   );
 }

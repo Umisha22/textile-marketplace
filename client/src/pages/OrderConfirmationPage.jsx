@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { api } from '../api/client.js';
-import { Spinner, StatusBadge } from '../components/ui.jsx';
+import { StatusBadge } from '../components/ui.jsx';
+import ThreadLoader from '../components/design-system/ThreadLoader.jsx';
 import GlassPanel from '../components/design-system/GlassPanel.jsx';
 import NeoButton from '../components/design-system/NeoButton.jsx';
 import { formatPrice, formatDateTime } from '../utils/format.js';
@@ -24,9 +25,7 @@ export default function OrderConfirmationPage() {
 
   if (loading) {
     return (
-      <div className="flex justify-center py-32">
-        <Spinner className="h-10 w-10 text-gold-400" />
-      </div>
+      <ThreadLoader text="Loading order…" />
     );
   }
 

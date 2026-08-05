@@ -5,7 +5,8 @@ import ProductCard from '../components/ProductCard.jsx';
 import PhotoSearch from '../components/PhotoSearch.jsx';
 import FabricIcon from '../components/FabricIcon.jsx';
 import GlassPanel from '../components/design-system/GlassPanel.jsx';
-import { EmptyState, Spinner } from '../components/ui.jsx';
+import ThreadLoader from '../components/design-system/ThreadLoader.jsx';
+import { EmptyState } from '../components/ui.jsx';
 import { CATEGORY_LABELS, FABRIC_TYPE_LABELS } from '../utils/constants.js';
 
 export default function ProductsPage() {
@@ -166,7 +167,7 @@ export default function ProductsPage() {
           </div>
 
           {loading ? (
-            <div className="flex justify-center py-24"><Spinner className="h-10 w-10 text-gold-500" /></div>
+            <ThreadLoader text="Searching fabrics…" />
           ) : products.length === 0 ? (
             <div className="py-10">
               <EmptyState title="No fabrics found" description="Try adjusting your filters or ask Weaver AI."

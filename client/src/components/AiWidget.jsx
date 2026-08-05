@@ -72,7 +72,7 @@ export default function AiWidget() {
         <button
           type="button"
           onClick={openPanel}
-          className="fixed bottom-5 right-4 z-40 flex h-14 w-14 items-center justify-center rounded-full neo-raised-gold shadow-[0_0_30px_rgba(212,168,83,0.3)] transition-all duration-300 hover:scale-105 hover:shadow-[0_0_50px_rgba(212,168,83,0.4)] sm:right-6"
+          className="fixed bottom-5 right-4 z-40 flex h-14 w-14 items-center justify-center rounded-2xl neo-raised-gold transition-all duration-350 ease-[cubic-bezier(0.34,1.56,0.64,1)] hover:scale-105 hover:shadow-[0_0_50px_rgba(212,168,83,0.4)] sm:right-6 focus:outline-none focus:ring-2 focus:ring-gold-500/40 focus:ring-offset-2 focus:ring-offset-void-950 active:scale-95"
           title="Chat with Weaver AI"
         >
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">

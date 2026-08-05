@@ -49,7 +49,7 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-40 mx-auto w-full max-w-7xl px-4 pt-3 sm:px-6">
       <nav
-        className="glass-strong flex h-14 items-center justify-between gap-4 rounded-2xl px-4 sm:px-6"
+        className="glass-strong flex h-14 items-center justify-between gap-4 rounded-3xl px-4 sm:px-6 transition-all duration-300"
         style={{ backdropFilter: `blur(${scrollBlur}px)`, WebkitBackdropFilter: `blur(${scrollBlur}px)` }}
       >
         <Link to={isSupplier ? '/supplier' : '/'} className="flex items-center gap-2.5">

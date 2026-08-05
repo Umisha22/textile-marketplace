@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { api } from '../api/client.js';
 import ProductImage from '../components/ProductImage.jsx';
-import { EmptyState, Spinner } from '../components/ui.jsx';
+import { EmptyState } from '../components/ui.jsx';
+import ThreadLoader from '../components/design-system/ThreadLoader.jsx';
 import GlassPanel from '../components/design-system/GlassPanel.jsx';
 
 export default function ComparePage() {
@@ -28,9 +29,7 @@ export default function ComparePage() {
 
   if (loading) {
     return (
-      <div className="flex justify-center py-32">
-        <Spinner className="h-10 w-10 text-gold-400" />
-      </div>
+      <ThreadLoader text="Comparing…" />
     );
   }
 

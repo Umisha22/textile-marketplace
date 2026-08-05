@@ -7,7 +7,7 @@ export default function GlassPanel({ children, className = '', variant = 'defaul
 
   return (
     <div
-      className={`${variants[variant]} rounded-2xl ${className}`}
+      className={`${variants[variant]} rounded-3xl transition-all duration-300 ease-out ${className}`}
       {...props}
     >
       {children}
