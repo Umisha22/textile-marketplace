@@ -40,7 +40,7 @@ export default function Navbar() {
             <>
               <NavLink to="/" className={(d) => `${navLink(d)} ${navLinkActive}`} end>Home</NavLink>
               <NavLink to="/products" className={(d) => `${navLink(d)} ${navLinkActive}`}>Fabric Library</NavLink>
-              <NavLink to="/assistant" className={(d) => `${navLink(d)} ${navLinkActive}`}>AI Assistant</NavLink>
+              <NavLink to="/login?mode=register" className={(d) => `${navLink(d)} ${navLinkActive}`}>Supplier</NavLink>
             </>
           ) : (
             <>
@@ -96,15 +96,9 @@ export default function Navbar() {
             <div className="hidden items-center gap-2 sm:flex">
               <Link
                 to="/login"
-                className="rounded-xl px-4 py-2 text-sm font-medium text-text-secondary transition hover:text-text-primary"
-              >
-                Log in
-              </Link>
-              <Link
-                to="/login?mode=register"
                 className="neo-raised rounded-xl bg-gold-500 px-4 py-2 text-sm font-bold text-void-950 transition-all duration-300 hover:bg-gold-400"
               >
-                Join now
+                Log in
               </Link>
             </div>
           )}
@@ -131,7 +125,7 @@ export default function Navbar() {
               <>
                 <Link to="/" onClick={() => setOpen(false)} className="rounded-xl px-3 py-2.5 text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-void-600/50">Home</Link>
                 <Link to="/products" onClick={() => setOpen(false)} className="rounded-xl px-3 py-2.5 text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-void-600/50">Fabric Library</Link>
-                <Link to="/assistant" onClick={() => setOpen(false)} className="rounded-xl px-3 py-2.5 text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-void-600/50">AI Assistant</Link>
+                <Link to="/login?mode=register" onClick={() => setOpen(false)} className="rounded-xl px-3 py-2.5 text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-void-600/50">Supplier</Link>
                 <Link to="/cart" onClick={() => setOpen(false)} className="rounded-xl px-3 py-2.5 text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-void-600/50">Cart ({count})</Link>
               </>
             ) : (
@@ -143,10 +137,7 @@ export default function Navbar() {
               </>
             )}
             {!user && (
-              <div className="mt-2 flex gap-2 border-t border-void-600 pt-3">
-                <Link to="/login" onClick={() => setOpen(false)} className="flex-1 rounded-xl border border-gold-500/20 px-3 py-2.5 text-center text-sm font-semibold text-gold-400">Log in</Link>
-                <Link to="/login?mode=register" onClick={() => setOpen(false)} className="flex-1 rounded-xl bg-gold-500 px-3 py-2.5 text-center text-sm font-bold text-void-950">Join now</Link>
-              </div>
+              <Link to="/login" onClick={() => setOpen(false)} className="mt-2 block rounded-xl bg-gold-500 px-3 py-2.5 text-center text-sm font-bold text-void-950">Log in</Link>
             )}
             {user && (
               <button type="button" onClick={handleLogout} className="mt-2 rounded-xl px-3 py-2.5 text-left text-sm font-semibold text-coral-400">

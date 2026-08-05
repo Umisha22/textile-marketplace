@@ -116,53 +116,26 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Categories */}
+      {/* Fabric types */}
       <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6">
         <div className="flex items-end justify-between">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-teal-500">Browse by category</p>
-            <h2 className="mt-2 font-display text-3xl font-bold text-text-primary">Shop fabric categories</h2>
+            <p className="text-xs font-semibold uppercase tracking-widest text-teal-500">Browse by fabric type</p>
+            <h2 className="mt-2 font-display text-2xl font-bold text-text-primary">Shop by weave & construction</h2>
           </div>
-          <Link to="/products" className="hidden text-sm font-semibold text-gold-400 hover:text-gold-300 sm:block">
-            View all →
-          </Link>
+          <Link to="/products" className="text-sm font-semibold text-gold-400 hover:text-gold-300">View all →</Link>
         </div>
-        <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
-          {categories.slice(0, 6).map((c) => (
+        <div className="mt-6 flex flex-wrap gap-2">
+          {Object.entries(FABRIC_TYPE_LABELS).map(([type, label]) => (
             <Link
-              key={c.name}
-              to={`/products?category=${c.name}`}
-              className="group neo-raised rounded-2xl p-5 text-center transition-all duration-400 hover:-translate-y-1 hover:shadow-[var(--shadow-neo-hover)]"
+              key={type}
+              to={`/products?fabricType=${type}`}
+              className="neo-flat flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold text-text-secondary transition-all duration-300 hover:text-gold-400 hover:shadow-[0_0_20px_rgba(212,168,83,0.08)]"
             >
-              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-gold-500/10 text-gold-400 transition group-hover:bg-gold-500/20">
-                <FabricIcon fabricType={CATEGORY_ICON[c.name] || 'woven'} className="h-6 w-6" />
-              </div>
-              <p className="mt-3 font-display text-sm font-semibold text-text-primary">{CATEGORY_LABELS[c.name] || c.name}</p>
-              <p className="mt-0.5 text-xs text-text-muted">{c.count} products</p>
+              <FabricIcon fabricType={type} className="h-3.5 w-3.5 text-text-muted transition group-hover:text-gold-400" />
+              {label}
             </Link>
           ))}
-        </div>
-      </section>
-
-      {/* Fabric types */}
-      <section className="border-y border-void-600/50">
-        <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6">
-          <div className="text-center">
-            <p className="text-xs font-semibold uppercase tracking-widest text-teal-500">By fabric type</p>
-            <h2 className="mt-2 font-display text-3xl font-bold text-text-primary">Shop by weave & construction</h2>
-          </div>
-          <div className="mt-8 flex flex-wrap justify-center gap-3">
-            {Object.entries(FABRIC_TYPE_LABELS).map(([type, label]) => (
-              <Link
-                key={type}
-                to={`/products?fabricType=${type}`}
-                className="group neo-flat flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold text-text-secondary transition-all duration-300 hover:text-gold-400 hover:shadow-[0_0_20px_rgba(212,168,83,0.08)]"
-              >
-                <FabricIcon fabricType={type} className="h-5 w-5 text-text-muted transition group-hover:text-gold-400" />
-                {label}
-              </Link>
-            ))}
-          </div>
         </div>
       </section>
 
