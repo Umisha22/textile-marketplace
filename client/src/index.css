@@ -280,12 +280,14 @@ body {
 }
 
 .thread-wave-loader {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
   gap: 3px;
   height: 24px;
-  margin: 0 auto;
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
 }
 .thread-wave-loader .strand {
   width: 3px;
