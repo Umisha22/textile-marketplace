@@ -108,6 +108,17 @@ body {
   box-shadow: var(--shadow-neo-raised);
   border: 1px solid rgba(255, 255, 255, 0.04);
 }
+.neo-raised-gold {
+  background: var(--color-gold-500);
+  color: var(--color-void-950);
+  box-shadow: var(--shadow-neo-raised);
+  border: 1px solid rgba(212, 168, 83, 0.3);
+}
+.neo-raised-gold:hover {
+  background: var(--color-gold-400);
+  box-shadow: var(--shadow-neo-hover);
+}
+}
 .neo-pressed {
   background: var(--color-void-700);
   box-shadow: var(--shadow-neo-pressed);

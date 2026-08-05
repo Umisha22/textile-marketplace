@@ -123,7 +123,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-gold-500 py-3 text-sm font-bold text-void-950 transition-all duration-300 hover:bg-gold-400 neo-raised disabled:opacity-60"
+            className="flex w-full items-center justify-center gap-2 rounded-xl neo-raised-gold py-3 text-sm font-bold transition-all duration-300 disabled:opacity-60"
           >
             {loading && <Spinner className="h-4 w-4" />}
             {mode === 'register' ? 'Create account' : 'Log in'}

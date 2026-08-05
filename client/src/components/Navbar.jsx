@@ -96,7 +96,7 @@ export default function Navbar() {
             <div className="hidden items-center gap-2 sm:flex">
               <Link
                 to="/login"
-                className="neo-raised rounded-xl bg-gold-500 px-4 py-2 text-sm font-bold text-void-950 transition-all duration-300 hover:bg-gold-400"
+                className="neo-raised-gold rounded-xl px-4 py-2 text-sm font-bold transition-all duration-300"
               >
                 Log in
               </Link>

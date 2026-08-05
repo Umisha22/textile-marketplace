@@ -74,10 +74,10 @@ export default function ProductsPage() {
         {pagination.total > 0 && <p className="text-sm text-text-secondary">{pagination.total} products found</p>}
       </div>
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-[240px_1fr]">
+      <div className="mt-6 flex gap-6">
         {/* Filters */}
-        <aside className={`${mobileFilters ? 'block' : 'hidden'} lg:block`}>
-          <div className="sticky top-20 space-y-6 glass-strong rounded-2xl p-5">
+        <aside className={`${mobileFilters ? 'block' : 'hidden'} lg:block lg:w-[240px] lg:shrink-0`}>
+          <div className="lg:sticky lg:top-20 lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto space-y-6 glass-strong rounded-2xl p-5">
             <div>
               <h3 className="text-sm font-semibold text-text-primary">Search</h3>
               <input value={search} onChange={(e) => updateParam('search', e.target.value)} placeholder="e.g. organic cotton…"
@@ -124,7 +124,7 @@ export default function ProductsPage() {
               <div className="neo-flat rounded-xl p-3">
                 <p className="text-xs font-semibold text-text-primary">{compareList.length} in compare</p>
                 <a href={`/compare?ids=${compareList.map((p) => p._id || p.id).join(',')}`}
-                  className="mt-2 block rounded-lg bg-gold-500 px-3 py-2 text-center text-xs font-bold text-void-950">
+                  className="neo-raised-gold mt-2 block rounded-lg px-3 py-2 text-center text-xs font-bold">
                   Compare now ⚖
                 </a>
               </div>
@@ -145,7 +145,7 @@ export default function ProductsPage() {
                 Filters
               </button>
               <PhotoSearch label="Search by photo"
-                className="rounded-lg bg-gold-500 px-4 py-2 text-sm font-bold text-void-950 hover:bg-gold-400"
+                className="neo-raised-gold rounded-lg px-4 py-2 text-sm font-bold"
                 onColors={(hexes) => updateParam('colorHex', hexes.slice(0, 2).join(','))} />
               {colorHex && (
                 <button type="button" onClick={() => updateParam('colorHex', '')}
@@ -185,7 +185,7 @@ export default function ProductsPage() {
             <div className="mt-8 flex justify-center gap-2">
               {Array.from({ length: pagination.pages }, (_, i) => i + 1).slice(0, 8).map((p) => (
                 <button key={p} type="button" onClick={() => load(p)}
-                  className={`h-9 w-9 rounded-lg text-sm font-semibold transition ${pagination.page === p ? 'bg-gold-500 text-void-950' : 'neo-flat text-text-secondary hover:text-text-primary'}`}>
+                  className={`h-9 w-9 rounded-lg text-sm font-semibold transition ${pagination.page === p ? 'neo-raised-gold' : 'neo-flat text-text-secondary hover:text-text-primary'}`}>
                   {p}
                 </button>
               ))}

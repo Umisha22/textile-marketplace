@@ -68,10 +68,10 @@ export default function Landing() {
             </form>
 
             <div className="mt-6 flex flex-wrap gap-3">
-              <Link to="/products" className="neo-raised rounded-xl bg-gold-500/10 px-5 py-3 text-sm font-semibold text-gold-400 transition hover:bg-gold-500/20">
+              <Link to="/products" className="neo-raised-gold rounded-xl px-5 py-3 text-sm font-bold transition">
                 Browse Fabric Library
               </Link>
-              <Link to="/assistant" className="neo-flat rounded-xl px-5 py-3 text-sm font-semibold text-text-secondary transition hover:text-text-primary">
+              <Link to="/assistant" className="neo-raised rounded-xl px-5 py-3 text-sm font-semibold text-text-secondary transition hover:text-text-primary">
                 🧶 Meet Weaver AI
               </Link>
             </div>
@@ -188,10 +188,10 @@ export default function Landing() {
                 and answers product questions — even by voice.
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
-                <Link to="/assistant" className="neo-raised rounded-xl bg-gold-500 px-5 py-3 text-sm font-bold text-void-950 transition hover:bg-gold-400">
+                <Link to="/assistant" className="neo-raised-gold rounded-xl px-5 py-3 text-sm font-bold transition">
                   Try the assistant
                 </Link>
-                <Link to="/products" className="neo-flat rounded-xl px-5 py-3 text-sm font-semibold text-text-secondary transition hover:text-text-primary">
+                <Link to="/products" className="neo-raised rounded-xl px-5 py-3 text-sm font-semibold text-text-secondary transition hover:text-text-primary">
                   Browse manually
                 </Link>
               </div>
@@ -244,7 +244,7 @@ export default function Landing() {
             <p className="mt-4 max-w-lg text-sm leading-relaxed text-text-secondary">
               List your inventory in minutes, manage stock, and fulfil incoming orders from a single supplier console.
             </p>
-            <Link to="/login?mode=register" className="mt-6 inline-block neo-raised rounded-xl bg-gold-500 px-6 py-3 text-sm font-bold text-void-950 transition hover:bg-gold-400">
+            <Link to="/login?mode=register" className="neo-raised-gold mt-6 inline-block rounded-xl px-6 py-3 text-sm font-bold transition">
               Become a supplier
             </Link>
           </div>
