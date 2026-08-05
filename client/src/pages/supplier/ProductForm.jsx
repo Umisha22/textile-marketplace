@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { api } from '../../api/client.js';
 import { Spinner } from '../../components/ui.jsx';
+import GlassPanel from '../../components/design-system/GlassPanel.jsx';
+import NeoButton from '../../components/design-system/NeoButton.jsx';
 import { useToast } from '../../context/ToastContext.jsx';
 import { CATEGORY_LABELS, FABRIC_TYPE_LABELS } from '../../utils/constants.js';
 
@@ -127,35 +129,35 @@ export default function ProductForm() {
     }
   };
 
-  const inputCls = 'w-full rounded-xl border border-brand-200 bg-cream-50 px-4 py-2.5 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100';
+  const inputCls = 'w-full rounded-xl border border-void-600 bg-void-700/50 px-4 py-2.5 text-sm text-text-primary placeholder:text-text-muted outline-none focus:border-gold-500/30 focus:ring-1 focus:ring-gold-500/20';
 
   if (loading) {
-    return <div className="flex justify-center py-24"><Spinner className="h-10 w-10 text-brand-600" /></div>;
+    return <div className="flex justify-center py-24"><Spinner className="h-10 w-10 text-gold-400" /></div>;
   }
 
   return (
     <div className="mx-auto max-w-3xl">
-      <h1 className="font-display text-3xl font-bold text-brand-900">
+      <h1 className="font-display text-3xl font-bold text-text-primary">
         {isEdit ? 'Edit product' : 'Add new product'}
       </h1>
-      <p className="mt-1 text-sm text-brand-500">
+      <p className="mt-1 text-sm text-text-secondary">
         {isEdit ? 'Update details, stock or availability.' : 'List a new fabric in your inventory.'}
       </p>
 
       <form onSubmit={submit} className="mt-8 space-y-6">
-        <section className="rounded-2xl border border-brand-100 bg-white p-6 shadow-soft">
-          <h2 className="font-display text-lg font-bold text-brand-900">Basics</h2>
+        <GlassPanel className="p-6">
+          <h2 className="font-display text-lg font-bold text-text-primary">Basics</h2>
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
             <div className="sm:col-span-2">
-              <label className="text-sm font-medium text-brand-800">Product name *</label>
+              <label className="text-sm font-medium text-text-secondary">Product name *</label>
               <input required value={form.name} onChange={set('name')} placeholder="e.g. Egyptian Cotton Poplin 100s" className={`mt-1.5 ${inputCls}`} />
             </div>
             <div className="sm:col-span-2">
-              <label className="text-sm font-medium text-brand-800">Description *</label>
+              <label className="text-sm font-medium text-text-secondary">Description *</label>
               <textarea required rows={3} value={form.description} onChange={set('description')} placeholder="Composition, handfeel, best uses…" className={`mt-1.5 ${inputCls}`} />
             </div>
             <div>
-              <label className="text-sm font-medium text-brand-800">Category *</label>
+              <label className="text-sm font-medium text-text-secondary">Category *</label>
               <select value={form.category} onChange={set('category')} className={`mt-1.5 ${inputCls}`}>
                 {Object.entries(CATEGORY_LABELS).map(([v, l]) => (
                   <option key={v} value={v}>{l}</option>
@@ -163,7 +165,7 @@ export default function ProductForm() {
               </select>
             </div>
             <div>
-              <label className="text-sm font-medium text-brand-800">Fabric type</label>
+              <label className="text-sm font-medium text-text-secondary">Fabric type</label>
               <select value={form.fabricType} onChange={set('fabricType')} className={`mt-1.5 ${inputCls}`}>
                 <option value="">Select…</option>
                 {Object.entries(FABRIC_TYPE_LABELS).map(([v, l]) => (
@@ -172,45 +174,45 @@ export default function ProductForm() {
               </select>
             </div>
           </div>
-        </section>
+        </GlassPanel>
 
-        <section className="rounded-2xl border border-brand-100 bg-white p-6 shadow-soft">
-          <h2 className="font-display text-lg font-bold text-brand-900">Pricing & inventory</h2>
+        <GlassPanel className="p-6">
+          <h2 className="font-display text-lg font-bold text-text-primary">Pricing & inventory</h2>
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
             <div>
-              <label className="text-sm font-medium text-brand-800">Price *</label>
+              <label className="text-sm font-medium text-text-secondary">Price *</label>
               <input type="number" min="0" step="0.01" required value={form.price} onChange={set('price')} placeholder="4.20" className={`mt-1.5 ${inputCls}`} />
             </div>
             <div>
-              <label className="text-sm font-medium text-brand-800">Unit</label>
+              <label className="text-sm font-medium text-text-secondary">Unit</label>
               <select value={form.unit} onChange={set('unit')} className={`mt-1.5 ${inputCls}`}>
                 {['meter', 'yard', 'roll', 'kg'].map((u) => <option key={u} value={u}>{u}</option>)}
               </select>
             </div>
             <div>
-              <label className="text-sm font-medium text-brand-800">Stock (units) *</label>
+              <label className="text-sm font-medium text-text-secondary">Stock (units) *</label>
               <input type="number" min="0" required value={form.stock} onChange={set('stock')} placeholder="10000" className={`mt-1.5 ${inputCls}`} />
             </div>
             <div>
-              <label className="text-sm font-medium text-brand-800">MOQ</label>
+              <label className="text-sm font-medium text-text-secondary">MOQ</label>
               <input type="number" min="1" value={form.moq} onChange={set('moq')} placeholder="100" className={`mt-1.5 ${inputCls}`} />
             </div>
           </div>
 
           <div className="mt-4 flex flex-wrap gap-6">
-            <label className="flex items-center gap-2 text-sm font-medium text-brand-800">
-              <input type="checkbox" checked={form.isActive} onChange={setCheck('isActive')} className="h-4 w-4 accent-brand-600" />
+            <label className="flex items-center gap-2 text-sm font-medium text-text-secondary">
+              <input type="checkbox" checked={form.isActive} onChange={setCheck('isActive')} className="h-4 w-4 accent-gold-500" />
               Available to buyers
             </label>
-            <label className="flex items-center gap-2 text-sm font-medium text-brand-800">
-              <input type="checkbox" checked={form.featured} onChange={setCheck('featured')} className="h-4 w-4 accent-clay-500" />
+            <label className="flex items-center gap-2 text-sm font-medium text-text-secondary">
+              <input type="checkbox" checked={form.featured} onChange={setCheck('featured')} className="h-4 w-4 accent-gold-500" />
               Featured on homepage
             </label>
           </div>
-        </section>
+        </GlassPanel>
 
-        <section className="rounded-2xl border border-brand-100 bg-white p-6 shadow-soft">
-          <h2 className="font-display text-lg font-bold text-brand-900">Specifications</h2>
+        <GlassPanel className="p-6">
+          <h2 className="font-display text-lg font-bold text-text-primary">Specifications</h2>
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
             {[
               ['composition', 'Composition'],
@@ -220,42 +222,38 @@ export default function ProductForm() {
               ['finish', 'Finish'],
             ].map(([k, l]) => (
               <div key={k}>
-                <label className="text-sm font-medium text-brand-800">{l}</label>
+                <label className="text-sm font-medium text-text-secondary">{l}</label>
                 <input value={form[k]} onChange={set(k)} placeholder={l} className={`mt-1.5 ${inputCls}`} />
               </div>
             ))}
           </div>
-        </section>
+        </GlassPanel>
 
-        <section className="rounded-2xl border border-brand-100 bg-white p-6 shadow-soft">
-          <h2 className="font-display text-lg font-bold text-brand-900">Colors & tags</h2>
+        <GlassPanel className="p-6">
+          <h2 className="font-display text-lg font-bold text-text-primary">Colors & tags</h2>
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
             <div>
-              <label className="text-sm font-medium text-brand-800">Colors (comma separated)</label>
+              <label className="text-sm font-medium text-text-secondary">Colors (comma separated)</label>
               <input value={form.colors} onChange={set('colors')} placeholder="White, Navy, Beige" className={`mt-1.5 ${inputCls}`} />
             </div>
             <div>
-              <label className="text-sm font-medium text-brand-800">Tags (comma separated)</label>
+              <label className="text-sm font-medium text-text-secondary">Tags (comma separated)</label>
               <input value={form.tags} onChange={set('tags')} placeholder="summer, shirting, breathable" className={`mt-1.5 ${inputCls}`} />
             </div>
           </div>
-        </section>
+        </GlassPanel>
 
-        {error && <p className="rounded-lg bg-clay-50 px-3 py-2 text-sm text-clay-700">{error}</p>}
+        {error && <p className="rounded-lg bg-coral-500/10 border border-coral-500/20 px-3 py-2 text-sm text-coral-400">{error}</p>}
 
         <div className="flex gap-3">
-          <button
-            type="submit"
-            disabled={saving}
-            className="flex items-center gap-2 rounded-xl bg-brand-800 px-6 py-3 text-sm font-bold text-white transition hover:bg-brand-700 disabled:opacity-60"
-          >
+          <NeoButton type="submit" disabled={saving}>
             {saving && <Spinner className="h-4 w-4" />}
             {isEdit ? 'Save changes' : 'Add product'}
-          </button>
+          </NeoButton>
           <button
             type="button"
             onClick={() => navigate('/supplier/products')}
-            className="rounded-xl border border-brand-200 px-6 py-3 text-sm font-semibold text-brand-700"
+            className="rounded-xl border border-void-500/50 px-6 py-3 text-sm font-semibold text-text-secondary hover:border-gold-500/30 hover:text-gold-400 transition"
           >
             Cancel
           </button>

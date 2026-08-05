@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { api } from '../../api/client.js';
 import { Spinner } from '../../components/ui.jsx';
+import GlassPanel from '../../components/design-system/GlassPanel.jsx';
+import NeoButton from '../../components/design-system/NeoButton.jsx';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { useToast } from '../../context/ToastContext.jsx';
 import { CURRENCIES, setCurrency } from '../../utils/currency.js';
@@ -45,7 +47,6 @@ export default function SupplierProfile() {
       description: p.description || '',
       currency: p.currency || 'USD',
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const set = (k) => (e) => setForm({ ...form, [k]: e.target.value });
@@ -88,61 +89,61 @@ export default function SupplierProfile() {
     }
   };
 
-  const inputCls = 'w-full rounded-xl border border-brand-200 bg-cream-50 px-4 py-2.5 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100';
+  const inputCls = 'w-full rounded-xl border border-void-600 bg-void-700/50 px-4 py-2.5 text-sm text-text-primary placeholder:text-text-muted outline-none focus:border-gold-500/30 focus:ring-1 focus:ring-gold-500/20';
   const chip = (active) =>
-    `rounded-full border px-3 py-1.5 text-xs font-semibold transition ${active ? 'border-brand-600 bg-brand-600 text-white' : 'border-brand-200 bg-white text-brand-700 hover:border-brand-400'}`;
+    `rounded-full border px-3 py-1.5 text-xs font-semibold transition ${active ? 'border-gold-500/30 bg-gold-500/10 text-gold-400' : 'border-void-600/50 bg-void-700/50 text-text-muted hover:border-gold-500/30 hover:text-gold-400'}`;
 
   if (!user) return null;
 
   return (
     <div className="mx-auto max-w-3xl">
-      <h1 className="font-display text-3xl font-bold text-brand-900">Business profile</h1>
-      <p className="mt-1 text-sm text-brand-500">This information is shown to buyers on your product pages.</p>
+      <h1 className="font-display text-3xl font-bold text-text-primary">Business profile</h1>
+      <p className="mt-1 text-sm text-text-secondary">This information is shown to buyers on your product pages.</p>
 
       <div className="mt-8 space-y-6">
-        <section className="rounded-2xl border border-brand-100 bg-white p-6 shadow-soft">
-          <h2 className="font-display text-lg font-bold text-brand-900">Identity & contact</h2>
+        <GlassPanel className="p-6">
+          <h2 className="font-display text-lg font-bold text-text-primary">Identity & contact</h2>
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
             <div>
-              <label className="text-sm font-medium text-brand-800">Business name *</label>
+              <label className="text-sm font-medium text-text-secondary">Business name *</label>
               <input value={form.businessName} onChange={set('businessName')} className={`mt-1.5 ${inputCls}`} />
             </div>
             <div>
-              <label className="text-sm font-medium text-brand-800">Business type</label>
+              <label className="text-sm font-medium text-text-secondary">Business type</label>
               <input value={form.businessType} onChange={set('businessType')} placeholder="Mill, exporter, trader…" className={`mt-1.5 ${inputCls}`} />
             </div>
             <div>
-              <label className="text-sm font-medium text-brand-800">Contact email</label>
+              <label className="text-sm font-medium text-text-secondary">Contact email</label>
               <input type="email" value={form.contactEmail} onChange={set('contactEmail')} className={`mt-1.5 ${inputCls}`} />
             </div>
             <div>
-              <label className="text-sm font-medium text-brand-800">Contact phone</label>
+              <label className="text-sm font-medium text-text-secondary">Contact phone</label>
               <input value={form.contactPhone} onChange={set('contactPhone')} className={`mt-1.5 ${inputCls}`} />
             </div>
           </div>
-        </section>
+        </GlassPanel>
 
-        <section className="rounded-2xl border border-brand-100 bg-white p-6 shadow-soft">
-          <h2 className="font-display text-lg font-bold text-brand-900">Address & hours</h2>
+        <GlassPanel className="p-6">
+          <h2 className="font-display text-lg font-bold text-text-primary">Address & hours</h2>
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
             <div className="sm:col-span-2">
-              <label className="text-sm font-medium text-brand-800">Street address</label>
+              <label className="text-sm font-medium text-text-secondary">Street address</label>
               <input value={form.addressLine1} onChange={set('addressLine1')} className={`mt-1.5 ${inputCls}`} />
             </div>
             <div>
-              <label className="text-sm font-medium text-brand-800">City</label>
+              <label className="text-sm font-medium text-text-secondary">City</label>
               <input value={form.addressCity} onChange={set('addressCity')} className={`mt-1.5 ${inputCls}`} />
             </div>
             <div>
-              <label className="text-sm font-medium text-brand-800">State</label>
+              <label className="text-sm font-medium text-text-secondary">State</label>
               <input value={form.addressState} onChange={set('addressState')} className={`mt-1.5 ${inputCls}`} />
             </div>
             <div>
-              <label className="text-sm font-medium text-brand-800">Country</label>
+              <label className="text-sm font-medium text-text-secondary">Country</label>
               <input value={form.addressCountry} onChange={set('addressCountry')} className={`mt-1.5 ${inputCls}`} />
             </div>
             <div>
-              <label className="text-sm font-medium text-brand-800">Operating hours</label>
+              <label className="text-sm font-medium text-text-secondary">Operating hours</label>
               <select value={form.operatingHours} onChange={set('operatingHours')} className={`mt-1.5 ${inputCls}`}>
                 {[
                   ['weekdays_9_6', 'Weekdays 9 AM – 6 PM'],
@@ -156,7 +157,7 @@ export default function SupplierProfile() {
               </select>
             </div>
             <div>
-              <label className="text-sm font-medium text-brand-800">Prices shown in</label>
+              <label className="text-sm font-medium text-text-secondary">Prices shown in</label>
               <select value={form.currency} onChange={set('currency')} className={`mt-1.5 ${inputCls}`}>
                 {CURRENCIES.map((c) => (
                   <option key={c.code} value={c.code}>{c.code} · {c.name}</option>
@@ -164,12 +165,12 @@ export default function SupplierProfile() {
               </select>
             </div>
           </div>
-        </section>
+        </GlassPanel>
 
-        <section className="rounded-2xl border border-brand-100 bg-white p-6 shadow-soft">
-          <h2 className="font-display text-lg font-bold text-brand-900">Catalog & MOQ</h2>
+        <GlassPanel className="p-6">
+          <h2 className="font-display text-lg font-bold text-text-primary">Catalog & MOQ</h2>
           <div className="mt-4">
-            <p className="text-sm font-medium text-brand-800">Categories you supply</p>
+            <p className="text-sm font-medium text-text-secondary">Categories you supply</p>
             <div className="mt-2 flex flex-wrap gap-2">
               {['cotton', 'silk', 'linen', 'wool', 'denim', 'polyester', 'viscose', 'blends', 'lace', 'embroidery', 'technical'].map((c) => (
                 <button key={c} type="button" onClick={() => toggleList('categories')(c)} className={chip(form.categories.includes(c))}>
@@ -179,7 +180,7 @@ export default function SupplierProfile() {
             </div>
           </div>
           <div className="mt-4">
-            <p className="text-sm font-medium text-brand-800">Fabric types</p>
+            <p className="text-sm font-medium text-text-secondary">Fabric types</p>
             <div className="mt-2 flex flex-wrap gap-2">
               {['poplin', 'chiffon', 'satin', 'jacquard', 'denim', 'muslin', 'canvas', 'velvet', 'knit', 'twill', 'georgette', 'organza'].map((f) => (
                 <button key={f} type="button" onClick={() => toggleList('fabricTypes')(f)} className={chip(form.fabricTypes.includes(f))}>
@@ -190,24 +191,19 @@ export default function SupplierProfile() {
           </div>
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
             <div>
-              <label className="text-sm font-medium text-brand-800">Minimum order quantity (units)</label>
+              <label className="text-sm font-medium text-text-secondary">Minimum order quantity (units)</label>
               <input type="number" min="1" value={form.moq} onChange={set('moq')} className={`mt-1.5 ${inputCls}`} />
             </div>
             <div>
-              <label className="text-sm font-medium text-brand-800">Description</label>
+              <label className="text-sm font-medium text-text-secondary">Description</label>
               <input value={form.description} onChange={set('description')} placeholder="Your mill's story, certifications…" className={`mt-1.5 ${inputCls}`} />
             </div>
           </div>
-        </section>
+        </GlassPanel>
 
-        <button
-          type="button"
-          onClick={save}
-          disabled={saving || !form.businessName}
-          className="flex items-center gap-2 rounded-xl bg-brand-800 px-6 py-3 text-sm font-bold text-white transition hover:bg-brand-700 disabled:opacity-50"
-        >
+        <NeoButton onClick={save} disabled={saving || !form.businessName}>
           {saving && <Spinner className="h-4 w-4" />} Save profile
-        </button>
+        </NeoButton>
       </div>
     </div>
   );

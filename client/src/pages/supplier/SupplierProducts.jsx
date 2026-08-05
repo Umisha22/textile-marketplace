@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../../api/client.js';
 import ProductImage from '../../components/ProductImage.jsx';
 import { Spinner, EmptyState } from '../../components/ui.jsx';
+import NeoButton from '../../components/design-system/NeoButton.jsx';
 import { useToast } from '../../context/ToastContext.jsx';
 import { formatPrice } from '../../utils/format.js';
 import { CATEGORY_LABELS } from '../../utils/constants.js';
@@ -49,18 +50,18 @@ export default function SupplierProducts() {
   };
 
   if (loading) {
-    return <div className="flex justify-center py-24"><Spinner className="h-10 w-10 text-brand-600" /></div>;
+    return <div className="flex justify-center py-24"><Spinner className="h-10 w-10 text-gold-400" /></div>;
   }
 
   return (
     <div>
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="font-display text-3xl font-bold text-brand-900">Inventory</h1>
-          <p className="mt-1 text-sm text-brand-500">{products.length} products in your catalog.</p>
+          <h1 className="font-display text-3xl font-bold text-text-primary">Inventory</h1>
+          <p className="mt-1 text-sm text-text-secondary">{products.length} products in your catalog.</p>
         </div>
-        <Link to="/supplier/products/new" className="rounded-xl bg-clay-500 px-4 py-2.5 text-sm font-bold text-white hover:bg-clay-600">
-          + Add product
+        <Link to="/supplier/products/new">
+          <NeoButton>+ Add product</NeoButton>
         </Link>
       </div>
 
@@ -69,14 +70,14 @@ export default function SupplierProducts() {
           <EmptyState
             title="No products yet"
             description="Add your first fabric to start receiving orders."
-            action={<Link to="/supplier/products/new" className="rounded-xl bg-brand-800 px-5 py-2.5 text-sm font-semibold text-white">Add your first product</Link>}
+            action={<Link to="/supplier/products/new" className="rounded-xl bg-gold-500 px-5 py-2.5 text-sm font-bold text-void-950">Add your first product</Link>}
           />
         </div>
       ) : (
-        <div className="mt-8 overflow-hidden rounded-2xl border border-brand-100 bg-white shadow-soft">
+        <div className="mt-8 overflow-hidden rounded-2xl border border-void-600/50 glass-strong">
           <div className="overflow-x-auto">
             <table className="w-full min-w-[720px] text-left text-sm">
-              <thead className="border-b border-brand-100 bg-brand-50 text-xs uppercase tracking-wider text-brand-500">
+              <thead className="border-b border-void-600/50 bg-void-700/50 text-xs uppercase tracking-wider text-text-muted">
                 <tr>
                   <th className="p-4">Product</th>
                   <th className="p-4">Price</th>
@@ -88,27 +89,27 @@ export default function SupplierProducts() {
               </thead>
               <tbody>
                 {products.map((p) => (
-                  <tr key={p._id} className="border-b border-brand-50 hover:bg-brand-50/40">
+                  <tr key={p._id} className="border-b border-void-600/30 hover:bg-void-700/30">
                     <td className="p-4">
                       <div className="flex items-center gap-3">
                         <div className="h-12 w-12 shrink-0 overflow-hidden rounded-lg">
                           <ProductImage product={p} className="!rounded-lg" />
                         </div>
                         <div className="min-w-0">
-                          <p className="font-semibold text-brand-900">{p.name}</p>
-                          <p className="text-xs text-brand-400">{CATEGORY_LABELS[p.category]} · {p.fabricType || '—'}</p>
+                          <p className="font-semibold text-text-primary">{p.name}</p>
+                          <p className="text-xs text-text-muted">{CATEGORY_LABELS[p.category]} · {p.fabricType || '—'}</p>
                         </div>
                       </div>
                     </td>
-                    <td className="p-4 font-semibold text-brand-900">{formatPrice(p.price)}/{p.unit}</td>
-                    <td className={`p-4 font-medium ${p.stock <= 300 ? 'text-clay-600' : 'text-brand-900'}`}>{p.stock.toLocaleString()}</td>
-                    <td className="p-4 text-brand-600">{p.moq || 100}</td>
+                    <td className="p-4 font-semibold text-gold-400">{formatPrice(p.price)}/{p.unit}</td>
+                    <td className={`p-4 font-medium ${p.stock <= 300 ? 'text-coral-400' : 'text-text-primary'}`}>{p.stock.toLocaleString()}</td>
+                    <td className="p-4 text-text-secondary">{p.moq || 100}</td>
                     <td className="p-4">
                       <button
                         type="button"
                         onClick={() => toggleActive(p)}
                         className={`rounded-full px-3 py-1 text-xs font-semibold transition ${
-                          p.isActive ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
+                          p.isActive ? 'bg-teal-500/20 text-teal-400 border border-teal-500/30' : 'bg-void-600/50 text-text-muted border border-void-500/50 hover:bg-void-600'
                         }`}
                       >
                         {p.isActive ? '● Live' : '○ Paused'}
@@ -119,14 +120,14 @@ export default function SupplierProducts() {
                         <button
                           type="button"
                           onClick={() => navigate(`/supplier/products/${p._id}/edit`)}
-                          className="rounded-lg border border-brand-200 px-3 py-1.5 text-xs font-semibold text-brand-700 hover:border-brand-400"
+                          className="rounded-lg border border-void-500/50 px-3 py-1.5 text-xs font-semibold text-text-secondary hover:border-gold-500/30 hover:text-gold-400 transition"
                         >
                           Edit
                         </button>
                         <button
                           type="button"
                           onClick={() => remove(p)}
-                          className="rounded-lg border border-clay-200 px-3 py-1.5 text-xs font-semibold text-clay-600 hover:bg-clay-50"
+                          className="rounded-lg border border-coral-500/20 px-3 py-1.5 text-xs font-semibold text-coral-400 hover:bg-coral-500/10 transition"
                         >
                           Delete
                         </button>

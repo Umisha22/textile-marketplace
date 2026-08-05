@@ -2,6 +2,8 @@ import { useCallback, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { api } from '../../api/client.js';
 import { Spinner, StatusBadge, EmptyState } from '../../components/ui.jsx';
+import GlassPanel from '../../components/design-system/GlassPanel.jsx';
+import NeoButton from '../../components/design-system/NeoButton.jsx';
 import { useToast } from '../../context/ToastContext.jsx';
 import { formatPrice, formatDateTime } from '../../utils/format.js';
 import { ORDER_STATUSES } from '../../utils/constants.js';
@@ -50,14 +52,14 @@ export default function SupplierOrders() {
     <div>
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="font-display text-3xl font-bold text-brand-900">Orders</h1>
-          <p className="mt-1 text-sm text-brand-500">Manage incoming orders through the fulfilment workflow.</p>
+          <h1 className="font-display text-3xl font-bold text-text-primary">Orders</h1>
+          <p className="mt-1 text-sm text-text-secondary">Manage incoming orders through the fulfilment workflow.</p>
         </div>
-        <div className="flex gap-1 overflow-x-auto rounded-xl border border-brand-200 bg-white p-1">
+        <div className="flex gap-1 overflow-x-auto rounded-xl border border-void-600/50 bg-void-700/50 p-1">
           <button
             type="button"
             onClick={() => setParams({})}
-            className={`whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-semibold ${!status ? 'bg-brand-800 text-white' : 'text-brand-600'}`}
+            className={`whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-semibold transition ${!status ? 'bg-gold-500/20 text-gold-400 border border-gold-500/30' : 'text-text-muted hover:text-text-secondary'}`}
           >
             All
           </button>
@@ -66,7 +68,7 @@ export default function SupplierOrders() {
               key={s.value}
               type="button"
               onClick={() => setParams({ status: s.value })}
-              className={`whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-semibold ${status === s.value ? 'bg-brand-800 text-white' : 'text-brand-600'}`}
+              className={`whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-semibold transition ${status === s.value ? 'bg-gold-500/20 text-gold-400 border border-gold-500/30' : 'text-text-muted hover:text-text-secondary'}`}
             >
               {s.label}
             </button>
@@ -75,13 +77,13 @@ export default function SupplierOrders() {
       </div>
 
       {loading ? (
-        <div className="flex justify-center py-24"><Spinner className="h-10 w-10 text-brand-600" /></div>
+        <div className="flex justify-center py-24"><Spinner className="h-10 w-10 text-gold-400" /></div>
       ) : orders.length === 0 ? (
         <div className="mt-8">
           <EmptyState
             title="No orders here"
             description="Orders from buyers will appear here as they come in."
-            action={<a href="/supplier/products" className="rounded-xl bg-brand-800 px-5 py-2.5 text-sm font-semibold text-white">Check your inventory</a>}
+            action={<a href="/supplier/products" className="rounded-xl bg-gold-500 px-5 py-2.5 text-sm font-bold text-void-950">Check your inventory</a>}
           />
         </div>
       ) : (
@@ -90,76 +92,75 @@ export default function SupplierOrders() {
             const idx = currentIdx(o);
             const next = ORDER_STATUSES[idx + 1];
             return (
-              <div key={o._id} className="overflow-hidden rounded-2xl border border-brand-100 bg-white shadow-soft">
+              <div key={o._id} className="overflow-hidden rounded-2xl border border-void-600/50 glass-strong">
                 <button
                   type="button"
                   onClick={() => setExpanded(expanded === o._id ? null : o._id)}
                   className="flex w-full flex-wrap items-center justify-between gap-3 px-5 py-4 text-left"
                 >
                   <div>
-                    <p className="font-semibold text-brand-900">{o.orderNumber}</p>
-                    <p className="text-xs text-brand-400">
+                    <p className="font-semibold text-text-primary">{o.orderNumber}</p>
+                    <p className="text-xs text-text-muted">
                       {o.buyer?.name} · {formatDateTime(o.createdAt)}
                     </p>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className="font-bold text-brand-900">{formatPrice(o.total)}</span>
+                    <span className="font-bold text-gold-400">{formatPrice(o.total)}</span>
                     <StatusBadge status={o.status} />
-                    <span className="text-brand-300">{expanded === o._id ? '▲' : '▼'}</span>
+                    <span className="text-text-muted">{expanded === o._id ? '▲' : '▼'}</span>
                   </div>
                 </button>
 
                 {expanded === o._id && (
-                  <div className="border-t border-brand-100 bg-brand-50/40 px-5 py-4">
+                  <div className="border-t border-void-600/50 bg-void-700/30 px-5 py-4">
                     <div className="grid gap-6 lg:grid-cols-2">
                       <div>
-                        <p className="text-xs font-semibold uppercase tracking-wider text-brand-400">Items</p>
+                        <p className="text-xs font-semibold uppercase tracking-wider text-text-muted">Items</p>
                         <div className="mt-2 space-y-2">
                           {o.items.map((it) => (
-                            <div key={it._id} className="flex items-center justify-between rounded-xl bg-white px-4 py-2.5 text-sm shadow-soft">
+                            <div key={it._id} className="flex items-center justify-between rounded-xl bg-void-700/50 px-4 py-2.5 text-sm border border-void-600/30">
                               <div>
-                                <p className="font-semibold text-brand-900">{it.name}</p>
-                                <p className="text-xs text-brand-400">{it.quantity} × {formatPrice(it.price)}{it.color ? ` · ${it.color}` : ''}</p>
+                                <p className="font-semibold text-text-primary">{it.name}</p>
+                                <p className="text-xs text-text-muted">{it.quantity} × {formatPrice(it.price)}{it.color ? ` · ${it.color}` : ''}</p>
                               </div>
-                              <p className="font-bold text-brand-900">{formatPrice(it.price * it.quantity)}</p>
+                              <p className="font-bold text-gold-400">{formatPrice(it.price * it.quantity)}</p>
                             </div>
                           ))}
                         </div>
-                        <div className="mt-3 rounded-xl bg-white px-4 py-3 text-sm shadow-soft">
-                          <div className="flex justify-between text-brand-500"><span>Subtotal</span><span>{formatPrice(o.subtotal)}</span></div>
-                          <div className="flex justify-between text-brand-500"><span>Tax</span><span>{formatPrice(o.tax)}</span></div>
-                          <div className="flex justify-between text-brand-500"><span>Shipping</span><span>{o.shipping === 0 ? 'Free' : formatPrice(o.shipping)}</span></div>
-                          <div className="flex justify-between pt-1 font-bold text-brand-900"><span>Total</span><span>{formatPrice(o.total)}</span></div>
+                        <div className="mt-3 rounded-xl bg-void-700/50 px-4 py-3 text-sm border border-void-600/30">
+                          <div className="flex justify-between text-text-secondary"><span>Subtotal</span><span>{formatPrice(o.subtotal)}</span></div>
+                          <div className="flex justify-between text-text-secondary"><span>Tax</span><span>{formatPrice(o.tax)}</span></div>
+                          <div className="flex justify-between text-text-secondary"><span>Shipping</span><span>{o.shipping === 0 ? 'Free' : formatPrice(o.shipping)}</span></div>
+                          <div className="flex justify-between pt-1 font-bold text-text-primary"><span>Total</span><span>{formatPrice(o.total)}</span></div>
                         </div>
                       </div>
 
                       <div>
-                        <p className="text-xs font-semibold uppercase tracking-wider text-brand-400">Ship to</p>
-                        <div className="mt-2 rounded-xl bg-white p-4 text-sm shadow-soft">
-                          <p className="font-semibold text-brand-900">{o.shippingAddress?.fullName}</p>
-                          {o.shippingAddress?.company && <p className="text-brand-600">{o.shippingAddress.company}</p>}
-                          <p className="mt-1 text-brand-600">
+                        <p className="text-xs font-semibold uppercase tracking-wider text-text-muted">Ship to</p>
+                        <div className="mt-2 rounded-xl bg-void-700/50 p-4 text-sm border border-void-600/30">
+                          <p className="font-semibold text-text-primary">{o.shippingAddress?.fullName}</p>
+                          {o.shippingAddress?.company && <p className="text-text-secondary">{o.shippingAddress.company}</p>}
+                          <p className="mt-1 text-text-secondary">
                             {o.shippingAddress?.address}, {o.shippingAddress?.city}, {o.shippingAddress?.state}, {o.shippingAddress?.country}
                           </p>
-                          {o.shippingAddress?.phone && <p className="text-brand-600">{o.shippingAddress.phone}</p>}
+                          {o.shippingAddress?.phone && <p className="text-text-secondary">{o.shippingAddress.phone}</p>}
                         </div>
                         {o.notes && (
-                          <p className="mt-3 rounded-xl bg-amber-50 p-3 text-xs text-amber-800">Buyer notes: {o.notes}</p>
+                          <p className="mt-3 rounded-xl bg-gold-500/10 border border-gold-500/20 p-3 text-xs text-gold-400">Buyer notes: {o.notes}</p>
                         )}
 
-                        <p className="mt-4 text-xs font-semibold uppercase tracking-wider text-brand-400">Update status</p>
+                        <p className="mt-4 text-xs font-semibold uppercase tracking-wider text-text-muted">Update status</p>
                         <div className="mt-2 flex flex-wrap gap-2">
                           {next ? (
-                            <button
-                              type="button"
+                            <NeoButton
                               disabled={updating === o._id}
-                              onClick={() => setStatus(o, next.value)}
-                              className="rounded-xl bg-brand-800 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-brand-700 disabled:opacity-60"
+                              onClick={() => setStatus(o, next)}
+                              className="text-sm"
                             >
                               {updating === o._id ? 'Updating…' : `Mark ${next.label}`}
-                            </button>
+                            </NeoButton>
                           ) : (
-                            <span className="rounded-xl bg-emerald-100 px-4 py-2.5 text-sm font-bold text-emerald-800">✓ Fulfilled</span>
+                            <span className="rounded-xl bg-teal-500/20 px-4 py-2.5 text-sm font-bold text-teal-400 border border-teal-500/30">Fulfilled</span>
                           )}
                         </div>
                       </div>

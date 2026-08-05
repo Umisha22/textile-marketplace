@@ -1,9 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
 
-/**
- * Microphone button using the browser Web Speech API (Chrome / Edge).
- * Disables itself when speech recognition is unavailable.
- */
 export default function VoiceButton({ onResult, disabled = false, className = '' }) {
   const [listening, setListening] = useState(false);
   const [supported, setSupported] = useState(true);
@@ -54,8 +50,8 @@ export default function VoiceButton({ onResult, disabled = false, className = ''
       title={listening ? 'Stop listening' : 'Speak your request'}
       className={`inline-flex items-center justify-center rounded-full transition ${
         listening
-          ? 'animate-pulse bg-clay-500 text-white'
-          : 'bg-brand-100 text-brand-700 hover:bg-brand-200'
+          ? 'animate-pulse bg-coral-500/20 text-coral-400 border border-coral-500/30'
+          : 'bg-void-700/50 text-text-secondary border border-void-600/50 hover:border-gold-500/30 hover:text-gold-400'
       } ${className}`}
     >
       {listening ? (
