@@ -118,7 +118,6 @@ body {
   background: var(--color-gold-400);
   box-shadow: var(--shadow-neo-hover);
 }
-}
 .neo-pressed {
   background: var(--color-void-700);
   box-shadow: var(--shadow-neo-pressed);
