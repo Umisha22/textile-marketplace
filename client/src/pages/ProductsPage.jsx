@@ -170,7 +170,7 @@ export default function ProductsPage() {
           ) : products.length === 0 ? (
             <div className="py-10">
               <EmptyState title="No fabrics found" description="Try adjusting your filters or ask Weaver AI."
-                action={<a href="/assistant" className="rounded-xl bg-gold-500 px-5 py-2.5 text-sm font-bold text-void-950">Ask Weaver AI</a>} />
+                action={<a href="/assistant" className="neo-raised-gold rounded-xl px-5 py-2.5 text-sm font-bold">Ask Weaver AI</a>} />
             </div>
           ) : (
             <div className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">

@@ -40,7 +40,7 @@ export default function ComparePage() {
         <EmptyState
           title="Cannot compare"
           description={error}
-          action={<Link to="/products" className="rounded-xl bg-gold-500 px-5 py-2.5 text-sm font-bold text-void-950">Browse fabrics</Link>}
+          action={<Link to="/products" className="neo-raised-gold rounded-xl px-5 py-2.5 text-sm font-bold">Browse fabrics</Link>}
         />
       </div>
     );

@@ -43,7 +43,7 @@ export default function CheckoutPage() {
     return (
       <div className="mx-auto max-w-xl px-4 py-24 text-center">
         <p className="text-lg font-semibold text-text-primary">Your cart is empty.</p>
-        <a href="/products" className="mt-3 inline-block rounded-xl bg-gold-500 px-5 py-2.5 text-sm font-bold text-void-950">Browse fabrics</a>
+        <a href="/products" className="neo-raised-gold mt-3 inline-block rounded-xl px-5 py-2.5 text-sm font-bold">Browse fabrics</a>
       </div>
     );
   }

@@ -83,7 +83,7 @@ export default function SupplierOrders() {
           <EmptyState
             title="No orders here"
             description="Orders from buyers will appear here as they come in."
-            action={<a href="/supplier/products" className="rounded-xl bg-gold-500 px-5 py-2.5 text-sm font-bold text-void-950">Check your inventory</a>}
+            action={<a href="/supplier/products" className="neo-raised-gold rounded-xl px-5 py-2.5 text-sm font-bold">Check your inventory</a>}
           />
         </div>
       ) : (

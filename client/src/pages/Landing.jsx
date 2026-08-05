@@ -62,7 +62,7 @@ export default function Landing() {
                 placeholder="Try organic cotton under $5 or silk chiffon..."
                 className="flex-1 bg-transparent px-4 py-3 text-sm text-text-primary outline-none placeholder:text-text-muted"
               />
-              <button type="submit" className="rounded-xl bg-gold-500 px-5 py-3 text-sm font-bold text-void-950 transition hover:bg-gold-400">
+              <button type="submit" className="neo-raised-gold rounded-xl px-5 py-3 text-sm font-bold transition">
                 Search
               </button>
             </form>
@@ -213,7 +213,7 @@ export default function Landing() {
       </section>
 
       {/* How it works */}
-      <section className="mx-auto max-w-7xl px-4 pb-16 sm:px-6">
+      <section id="how-it-works" className="mx-auto max-w-7xl px-4 pb-16 sm:px-6">
         <div className="text-center">
           <p className="text-xs font-semibold uppercase tracking-widest text-teal-500">Simple workflow</p>
           <h2 className="mt-2 font-display text-3xl font-bold text-text-primary">How the marketplace works</h2>

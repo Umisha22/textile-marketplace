@@ -14,7 +14,7 @@ export default function NeoButton({
   const btnRef = useRef(null);
 
   const colorMap = {
-    gold: 'bg-gold-500 text-void-950 hover:bg-gold-400 active:bg-gold-600',
+    gold: color === 'gold' ? '' : 'bg-gold-500 text-void-950 hover:bg-gold-400 active:bg-gold-600',
     teal: 'bg-teal-500 text-void-950 hover:bg-teal-400 active:bg-teal-600',
     coral: 'bg-coral-500 text-white hover:bg-coral-400 active:bg-coral-600',
     ghost: 'bg-transparent border border-gold-500/30 text-gold-400 hover:bg-gold-500/10 hover:border-gold-500/50',
@@ -28,7 +28,7 @@ export default function NeoButton({
   };
 
   const shadowMap = {
-    raised: pressed ? 'neo-pressed' : 'neo-raised',
+    raised: pressed ? 'neo-pressed' : (color === 'gold' ? 'neo-raised-gold' : 'neo-raised'),
     flat: pressed ? 'neo-pressed' : 'neo-flat',
   };
 

@@ -26,7 +26,7 @@ export default function CartPage() {
       <div className="mx-auto max-w-2xl px-4 py-16">
         <EmptyState title="Your cart is empty" description="Explore the fabric library or ask Weaver AI."
           action={<div className="flex gap-3">
-            <Link to="/products" className="rounded-xl bg-gold-500 px-5 py-2.5 text-sm font-bold text-void-950">Browse fabrics</Link>
+            <Link to="/products" className="neo-raised-gold rounded-xl px-5 py-2.5 text-sm font-bold">Browse fabrics</Link>
             <Link to="/assistant" className="rounded-xl border border-gold-500/30 px-5 py-2.5 text-sm font-semibold text-gold-400">Ask Weaver</Link>
           </div>} />
       </div>

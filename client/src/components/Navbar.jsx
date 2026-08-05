@@ -40,7 +40,7 @@ export default function Navbar() {
             <>
               <NavLink to="/" className={(d) => `${navLink(d)} ${navLinkActive}`} end>Home</NavLink>
               <NavLink to="/products" className={(d) => `${navLink(d)} ${navLinkActive}`}>Fabric Library</NavLink>
-              <NavLink to="/login?mode=register" className={(d) => `${navLink(d)} ${navLinkActive}`}>Supplier</NavLink>
+              <NavLink to="/#how-it-works" className={(d) => `${navLink(d)} ${navLinkActive}`}>How it works</NavLink>
             </>
           ) : (
             <>
@@ -125,7 +125,7 @@ export default function Navbar() {
               <>
                 <Link to="/" onClick={() => setOpen(false)} className="rounded-xl px-3 py-2.5 text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-void-600/50">Home</Link>
                 <Link to="/products" onClick={() => setOpen(false)} className="rounded-xl px-3 py-2.5 text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-void-600/50">Fabric Library</Link>
-                <Link to="/login?mode=register" onClick={() => setOpen(false)} className="rounded-xl px-3 py-2.5 text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-void-600/50">Supplier</Link>
+                <Link to="/#how-it-works" onClick={() => setOpen(false)} className="rounded-xl px-3 py-2.5 text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-void-600/50">How it works</Link>
                 <Link to="/cart" onClick={() => setOpen(false)} className="rounded-xl px-3 py-2.5 text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-void-600/50">Cart ({count})</Link>
               </>
             ) : (
@@ -137,7 +137,7 @@ export default function Navbar() {
               </>
             )}
             {!user && (
-              <Link to="/login" onClick={() => setOpen(false)} className="mt-2 block rounded-xl bg-gold-500 px-3 py-2.5 text-center text-sm font-bold text-void-950">Log in</Link>
+                <Link to="/login" onClick={() => setOpen(false)} className="mt-2 block rounded-xl neo-raised-gold px-3 py-2.5 text-center text-sm font-bold">Log in</Link>
             )}
             {user && (
               <button type="button" onClick={handleLogout} className="mt-2 rounded-xl px-3 py-2.5 text-left text-sm font-semibold text-coral-400">

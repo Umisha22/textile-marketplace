@@ -70,7 +70,7 @@ export default function SupplierProducts() {
           <EmptyState
             title="No products yet"
             description="Add your first fabric to start receiving orders."
-            action={<Link to="/supplier/products/new" className="rounded-xl bg-gold-500 px-5 py-2.5 text-sm font-bold text-void-950">Add your first product</Link>}
+            action={<Link to="/supplier/products/new" className="neo-raised-gold rounded-xl px-5 py-2.5 text-sm font-bold">Add your first product</Link>}
           />
         </div>
       ) : (

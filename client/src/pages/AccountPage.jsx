@@ -84,7 +84,7 @@ export default function AccountPage() {
               <EmptyState
                 title="No orders yet"
                 description="Your placed orders will appear here with live status tracking."
-                action={<Link to="/products" className="rounded-xl bg-gold-500 px-5 py-2.5 text-sm font-bold text-void-950">Start sourcing</Link>}
+                action={<Link to="/products" className="neo-raised-gold rounded-xl px-5 py-2.5 text-sm font-bold">Start sourcing</Link>}
               />
             </div>
           ) : (
